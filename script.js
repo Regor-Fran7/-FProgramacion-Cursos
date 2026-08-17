@@ -3262,7 +3262,7 @@ window.openShareLinkModal = function() {
 
     let currentUrl = window.location.href.split('#')[0];
     if (!currentUrl || currentUrl.startsWith('file://') || currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
-        currentUrl = 'http://172.20.10.6:8080/';
+        currentUrl = 'https://regor-fran7.github.io/-FProgramacion-Cursos/';
     }
 
     const inputUrl = document.getElementById('share-page-url-input');
