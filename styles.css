@@ -3438,6 +3438,47 @@ body.auth-locked > :not(#user-modal-overlay):not(#toast-container) {
         transform: translateX(0) !important;
     }
 
+    .sidebar-menu-wrapper {
+        display: block !important;
+        flex: 1 1 auto !important;
+        min-height: 280px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        overflow-y: visible !important;
+        margin-bottom: 16px !important;
+    }
+
+    .nav-menu {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        margin-bottom: 16px !important;
+    }
+
+    .nav-link {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 12px 14px !important;
+        font-size: 0.98rem !important;
+        font-weight: 600 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(0, 102, 255, 0.25) !important;
+        border-radius: var(--radius-md) !important;
+        color: #f8fafc !important;
+    }
+
+    .nav-link.active {
+        background: linear-gradient(135deg, rgba(0, 102, 255, 0.45), rgba(0, 204, 255, 0.3)) !important;
+        border-color: #00ccff !important;
+        color: #ffffff !important;
+        box-shadow: 0 0 15px rgba(0, 204, 255, 0.3) !important;
+    }
+
     body {
         padding-top: 60px;
     }
