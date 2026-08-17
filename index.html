@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Plataforma interactiva de estudio de programación para estudiantes de FP. Aprende Python, C++, Rust, Node.js, Java, SQL, TypeScript y Solidity.">
+    <title>DevHub FP - Plataforma de Estudio de Programación</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Background Glow Effects -->
+    <div class="glow-bg glow-1"></div>
+    <div class="glow-bg glow-2"></div>
+
+    <!-- Mobile Header Bar -->
+    <div class="mobile-top-bar">
+        <a href="#hero" class="nav-logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">D'<span class="highlight"> FProg</span></span>
+        </a>
+        <button id="mobile-sidebar-toggle" class="mobile-toggle-btn" aria-label="Abrir Menú Vertical">
+            ☰
+        </button>
+    </div>
+
+    <!-- Vertical Sidebar Navigation -->
+    <aside class="sidebar-nav" id="navbar">
+        <div class="sidebar-top">
+            <a href="#hero" class="nav-logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">D'<span class="highlight"> FProg</span></span>
+            </a>
+            <span class="sidebar-subtag">Formación Profesional</span>
+        </div>
+
+        <div class="sidebar-menu-wrapper">
+            <div class="sidebar-section-title">NAVEGACIÓN PRINCIPAL</div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#hero" class="nav-link active"><span class="nav-link-icon">🏠</span><span class="nav-link-text">Inicio</span></a></li>
+                <li><a href="#lenguajes" class="nav-link"><span class="nav-link-icon">💻</span><span class="nav-link-text">Lenguajes</span></a></li>
+                <li><a href="#cursos" class="nav-link"><span class="nav-link-icon">📚</span><span class="nav-link-text">Cursos PDF</span></a></li>
+                <li><a href="#visor-codigo" class="nav-link"><span class="nav-link-icon">👁️</span><span class="nav-link-text">Visor de Código</span></a></li>
+                <li><a href="#calculadora" class="nav-link"><span class="nav-link-icon">📊</span><span class="nav-link-text">Calculadora</span></a></li>
+                <li><a href="#quiz" class="nav-link"><span class="nav-link-icon">🎯</span><span class="nav-link-text">Desafíos Quiz</span></a></li>
+                <li><button onclick="openShareLinkModal()" class="nav-link" style="width: 100%; text-align: left; background: none; border: none; font: inherit; cursor: pointer;"><span class="nav-link-icon">🔗</span><span class="nav-link-text">Compartir Enlace</span></button></li>
+                <li><a href="#admin-dashboard" class="nav-link hidden" id="nav-link-admin"><span class="nav-link-icon">👑</span><span class="nav-link-text">Panel Admin</span></a></li>
+            </ul>
+
+            <div class="sidebar-section-title" style="margin-top: 20px;">TEMAS VISUALES</div>
+            <div class="theme-switcher-wrapper">
+                <button class="theme-btn active" data-theme-set="cyberpunk" title="Cyberpunk Cyan">🌌 Cyber</button>
+                <button class="theme-btn" data-theme-set="matrix" title="Matrix Neon">💻 Matrix</button>
+                <button class="theme-btn" data-theme-set="jarvis" title="Iron-Man J.A.R.V.I.S">🤖 JARVIS</button>
+                <button class="theme-btn" data-theme-set="light" title="Modo Claro Clean">☀️ Claro</button>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-nav-badge hidden" id="user-nav-badge" title="Ver mi Perfil de Estudiante">
+                <span class="user-avatar-mini" id="user-avatar-mini">👨‍💻</span>
+                <div class="user-nav-info">
+                    <span class="user-name-mini" id="user-name-mini">Estudiante</span>
+                    <span class="user-level-badge" id="user-level-badge">Nivel 1</span>
+                </div>
+            </div>
+            <div class="guest-nav-actions" id="guest-nav-actions">
+                <button id="btn-nav-login" class="btn btn-secondary btn-sm style-block" style="width: 100%; margin-bottom: 6px;">🔑 Iniciar Sesión</button>
+                <button id="btn-nav-register" class="btn btn-primary btn-sm style-block" style="width: 100%;">📝 Registrarse</button>
+            </div>
+            <div class="sidebar-action-row" style="display: flex; gap: 8px; margin-top: 8px;">
+                <button id="btn-open-user-modal" class="btn btn-outline btn-sm hidden" style="flex: 1;">👤 Mi Perfil</button>
+                <button id="btn-nav-logout" class="btn btn-danger-soft btn-sm hidden" title="Cerrar Sesión">🚪 Salir</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Hero Section / Vista Inicio -->
+    <header class="hero-section tab-view active" id="hero">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <div class="badge hero-badge">
+                    <span class="badge-dot"></span> Proyecto Académico de Programación
+                </div>
+                <h1 class="hero-title">
+                    Domina los <span class="gradient-text">8 Lenguajes Clave</span> de la Tecnología
+                </h1>
+                <p class="hero-subtitle">
+                    Una plataforma moderna diseñada para estudiantes de FP. Aprende, compara sintaxis y evalúa tus
+                    conocimientos en Python, C++, Rust, Node.js, Java, SQL, TypeScript y Solidity.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#lenguajes" class="btn btn-primary btn-lg">Ver Catálogo de Lenguajes 🚀</a>
+                    <a href="#calculadora" class="btn btn-secondary btn-lg">Calculadora de Notas 📊</a>
+                    <button onclick="openShareLinkModal()" class="btn btn-outline btn-lg">Compartir Enlace 🔗</button>
+                </div>
+            </div>
+
+            <!-- Hero Feature Cards Preview -->
+            <div class="hero-preview-grid">
+                <div class="mini-card lang-tag-py" onclick="selectLanguageInViewer('python')"
+                    title="Ver código en Python">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M11.898 0C5.89 0 6.27 2.618 6.27 2.618l.006 2.712h5.728v.816H3.973S0 5.67 0 11.758c0 6.088 3.454 5.877 3.454 5.877l2.062-.001v-2.91c0-3.328 2.859-3.23 2.859-3.23h5.666s2.697.043 2.697-2.618V3.053S17.18 0 11.898 0zm-3.23 1.834a1.009 1.009 0 1 1 0 2.018 1.009 1.009 0 0 1 0-2.018zM12.102 24c6.008 0 5.628-2.618 5.628-2.618l-.006-2.712h-5.728v-.816h8.031S24 18.33 24 12.242c0-6.088-3.454-5.877-3.454-5.877l-2.062.001v2.91c0 3.328-2.859 3.23-2.859 3.23h-5.666s-2.697-.043-2.697 2.618v5.88S6.82 24 12.102 24zm3.23-1.834a1.009 1.009 0 1 1 0-2.018 1.009 1.009 0 0 1 0 2.018z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">Python</span>
+                    <span class="mini-desc">IA & Data Science</span>
+                </div>
+                <div class="mini-card lang-tag-cpp" onclick="selectLanguageInViewer('cpp')" title="Ver código en C++">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M22.25 10.75h-1.5v-1.5h-1.5v1.5h-1.5v1.5h1.5v1.5h1.5v-1.5h1.5v-1.5zm-5.5 0h-1.5v-1.5h-1.5v1.5h-1.5v1.5h1.5v1.5h1.5v-1.5h1.5v-1.5zM10.82 5.56a6.44 6.44 0 0 0-4.57 1.9 6.47 6.47 0 0 0 0 9.08 6.44 6.44 0 0 0 4.57 1.9c1.47 0 2.87-.5 3.97-1.42l-1.39-1.39a4.42 4.42 0 0 1-2.58.82 4.47 4.47 0 0 1-3.16-1.31 4.48 4.48 0 0 1 0-6.31 4.47 4.47 0 0 1 3.16-1.31c.98 0 1.91.32 2.58.82l1.39-1.39a6.4 6.4 0 0 0-3.97-1.39z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">C++</span>
+                    <span class="mini-desc">High Performance</span>
+                </div>
+                <div class="mini-card lang-tag-rust" onclick="selectLanguageInViewer('rust')"
+                    title="Ver código en Rust">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0zm0 3.2a8.8 8.8 0 1 1-8.8 8.8 8.81 8.81 0 0 1 8.8-8.8zm-3.6 4.8v8h2.4v-2.8h1.2l1.8 2.8h2.8l-2.2-3.3a2.7 2.7 0 0 0 1.8-2.5c0-1.5-1.1-2.2-3.1-2.2zm2.4 2.1h1.5c.7 0 1.1.3 1.1.9 0 .6-.4.9-1.1.9H10.8z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">Rust</span>
+                    <span class="mini-desc">Sistemas Seguros</span>
+                </div>
+                <div class="mini-card lang-tag-node" onclick="selectLanguageInViewer('node')"
+                    title="Ver código en Node.js">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M12 0L1.75 5.92v12.16L12 24l10.25-5.92V5.92L12 0zm6.8 16.48l-6.8 3.92-6.8-3.92V7.52l6.8-3.92 6.8 3.92v8.96z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">Node.js</span>
+                    <span class="mini-desc">Backend Async</span>
+                </div>
+                <div class="mini-card lang-tag-java" onclick="selectLanguageInViewer('java')"
+                    title="Ver código en Java">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M8.851 18.56s-.917.534.667.718c1.745.195 3.332.181 5.759-.262 0 0 .584.348 1.252.617-2.673.83-6.529.742-8.587.218-.954-.243-1.077-.735.909-1.291zm-1.07-2.316s-1.107.715.485.907c1.947.235 4.708.261 7.848-.152 0 0 .467.319 1.054.524-3.528.877-8.472.784-10.457.172-1.042-.321-.734-.969 1.07-1.451zm7.842-4.084c.594.679.034 1.341-1.055 1.954-1.921 1.078-4.708 1.692-7.854 1.692-1.393 0-2.454-.107-2.454-.107s.484-.374 1.291-.588c2.257.213 4.965.134 7.027-.374.834-.206 1.706-.554 1.706-.991 0-.67-1.011-.945-2.023-1.121 0 0 .319-.481.718-.748 1.674.348 2.644.829 2.644 1.683zm-11.83 5.485c2.955.776 7.644.75 10.366.187.97-.201 1.761-.561 1.761-.99 0-.616-.838-.934-1.676-1.122 0 0 .319-.48.718-.747 1.674.347 2.644.829 2.644 1.683 0 1.258-1.573 1.954-3.585 2.37-3.238.67-8.62.616-11.758-.16 0 0 .553-.787 1.53-1.221z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">Java</span>
+                    <span class="mini-desc">Enterprise & POO</span>
+                </div>
+                <div class="mini-card lang-tag-sql" onclick="selectLanguageInViewer('sql')" title="Ver código en SQL">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 4.02 2 6.5v11C2 19.98 6.48 22 12 22s10-2.02 10-4.5v-11C22 4.02 17.52 2 12 2zm0 3c4.41 0 8 1.34 8 3s-3.59 3-8 3-8-1.34-8-3 3.59-3 8-3zm0 14c-4.41 0-8-1.34-8-3v-2.35c1.83 1.15 4.75 1.85 8 1.85s6.17-.7 8-1.85V16c0 1.66-3.59 3-8 3zm0-5.5c-4.41 0-8-1.34-8-3V8.15c1.83 1.15 4.75 1.85 8 1.85s6.17-.7 8-1.85V10.5c0 1.66-3.59 3-8 3z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">SQL</span>
+                    <span class="mini-desc">Bases de Datos</span>
+                </div>
+                <div class="mini-card lang-tag-ts" onclick="selectLanguageInViewer('typescript')"
+                    title="Ver código en TypeScript">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0H1.125zm16.518 10.605c.87 0 1.557.24 2.06.72.504.48.777 1.168.818 2.064h-1.92a1.35 1.35 0 0 0-.414-.852c-.225-.216-.546-.324-.963-.324-.396 0-.71.096-.942.288-.23.192-.346.438-.346.738 0 .228.07.414.21.558.14.144.336.26.588.348.252.09.588.18 1.008.27.708.156 1.272.33 1.692.522.42.192.76.456 1.02.792.258.336.388.762.388 1.278 0 .84-.3 1.512-.9 2.016-.6.504-1.446.756-2.538.756-1.02 0-1.812-.258-2.376-.774-.564-.516-.87-1.254-.918-2.214h1.968c.048.516.222.9.522 1.152.3.252.72.378 1.26.378.432 0 .786-.096 1.062-.288.276-.192.414-.462.414-.81 0-.252-.072-.456-.216-.612-.144-.156-.348-.282-.612-.378a10.02 10.02 0 0 0-1.032-.288c-.684-.156-1.23-.33-1.638-.522a2.82 2.82 0 0 1-.978-.774c-.246-.336-.369-.768-.369-1.296 0-.816.294-1.47.882-1.962.588-.492 1.404-.738 2.448-.738zm-6.84 0v1.752h-2.736v9.792H6.069v-9.792H3.333V10.6h7.47z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">TypeScript</span>
+                    <span class="mini-desc">JS Tipado</span>
+                </div>
+                <div class="mini-card lang-tag-sol" onclick="selectLanguageInViewer('solidity')"
+                    title="Ver código en Solidity">
+                    <span class="mini-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M12 0l-6 10.392L12 20.785l6-10.393L12 0zm0 3.464l3.999 6.928H8.001L12 3.464zM6 13.856l6 3.464 6-3.464L12 24 6 13.856z" />
+                        </svg>
+                    </span>
+                    <span class="mini-name">Solidity</span>
+                    <span class="mini-desc">Web3 & Smart Contracts</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main>
+        <!-- Section: Catálogo de Lenguajes -->
+        <section class="section tab-view" id="lenguajes">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Tecnologías y Lenguajes del Curso</h2>
+                    <p class="section-subtitle">
+                        Explora la ficha técnica, características y ámbito de aplicación de los 8 lenguajes incluidos en
+                        el proyecto.
+                    </p>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="filter-bar">
+                    <button class="filter-btn active" data-filter="all">Todos (8)</button>
+                    <button class="filter-btn" data-filter="backend">Backend & BD</button>
+                    <button class="filter-btn" data-filter="sistemas">Sistemas & Rendimiento</button>
+                    <button class="filter-btn" data-filter="modern">Web & Web3</button>
+                </div>
+
+                <!-- Languages Grid -->
+                <div class="languages-grid" id="languages-grid">
+                    <!-- Cards will be populated dynamically by script.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Cursos y Material de Estudio PDF -->
+        <section class="section bg-alt tab-view" id="cursos">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Cursos y Material de Estudio (PDFs)</h2>
+                    <p class="section-subtitle">
+                        Accede a los temas, guías y ejercicios prácticos correspondientes a los niveles Básico, Intermedio y Avanzado de Fundamentos de Programación.
+                    </p>
+                </div>
+
+                <!-- Language Progression Stepper Bar -->
+                <div class="lang-progression-container">
+                    <div class="lang-progression-header">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1rem; color: var(--secondary);">🛣️ Ruta de Aprendizaje por Lenguaje (Progreso Secuencial)</h4>
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">Completa los 28 cursos de cada lenguaje para desbloquear el siguiente lenguaje de programación.</small>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <div id="active-lang-status-badge" class="badge badge-accent">🐍 Python • 0 / 28 Completados</div>
+                            <button id="btn-open-certificate" class="btn btn-primary btn-sm hidden" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff; font-weight: 700; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">📜 Obtener Certificado PDF</button>
+                        </div>
+                    </div>
+                    <div class="lang-stepper-bar" id="lang-stepper-bar">
+                        <!-- Renderizado dinámicamente desde JS con los 8 lenguajes y sus candados -->
+                    </div>
+                </div>
+
+                <!-- Course Controls (Filters & Search) -->
+                <div class="course-controls-wrapper">
+                    <div class="filter-bar course-filter-bar">
+                        <button class="pdf-filter-btn active" data-pdf-filter="all">Todos (30)</button>
+                        <button class="pdf-filter-btn" data-pdf-filter="general">📕 Guías Generales (2)</button>
+                        <button class="pdf-filter-btn" data-pdf-filter="basico">🟢 Básico (13)</button>
+                        <button class="pdf-filter-btn" data-pdf-filter="intermedio">📘 Intermedio (10)</button>
+                        <button class="pdf-filter-btn" data-pdf-filter="avanzado">💜 Avanzado (5)</button>
+                    </div>
+
+                    <div class="search-box-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="pdf-search-input" class="search-input"
+                            placeholder="Buscar tema o documento (ej: Arreglos, Funciones, Structs)...">
+                        <button id="pdf-search-clear" class="search-clear-btn hidden"
+                            title="Limpiar búsqueda">&times;</button>
+                    </div>
+                </div>
+
+                <!-- PDF Courses Grid -->
+                <div class="pdf-courses-grid" id="pdf-courses-grid">
+                    <!-- PDF Cards populated dynamically by script.js -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Visor de Código Interactivo -->
+        <section class="section bg-alt tab-view" id="visor-codigo">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Visor de Código & Comparador de Sintaxis</h2>
+                    <p class="section-subtitle">
+                        Selecciona un lenguaje y un tema básico para examinar cómo se escribe y ejecuta el código en
+                        cada tecnología.
+                    </p>
+                </div>
+
+                <div class="code-viewer-container">
+                    <!-- Code Controls Header -->
+                    <div class="code-controls">
+                        <div class="control-group">
+                            <label for="lang-select">Lenguaje:</label>
+                            <select id="lang-select" class="form-select">
+                                <option value="python">Python 🐍</option>
+                                <option value="cpp">C++ ⚙️</option>
+                                <option value="rust">Rust 🦀</option>
+                                <option value="node">Node.js 🟢</option>
+                                <option value="java">Java ☕</option>
+                                <option value="sql">SQL 🗄️</option>
+                                <option value="typescript">TypeScript 🟦</option>
+                                <option value="solidity">Solidity ⛓️</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="topic-select">Ejemplo de Código:</label>
+                            <select id="topic-select" class="form-select">
+                                <option value="hello">1. Hola Mundo & Mensaje</option>
+                                <option value="variables">2. Variables & Tipos de Datos</option>
+                                <option value="loops">3. Condicionales & Bucles</option>
+                                <option value="functions">4. Funciones / Consultas / Métodos</option>
+                            </select>
+                        </div>
+
+                        <div class="code-actions-group">
+                            <button id="btn-run-code" class="btn btn-primary btn-sm btn-run">▶️ Compilar &
+                                Ejecutar</button>
+                            <button id="btn-reset-code" class="btn btn-outline btn-sm"
+                                title="Restablecer al código original">🔄 Restablecer</button>
+                            <button id="btn-copy-code" class="btn btn-outline btn-sm">📋 Copiar</button>
+                        </div>
+                    </div>
+
+                    <!-- Code Display & Editable Editor Box -->
+                    <div class="code-window">
+                        <div class="window-header">
+                            <div class="window-dots">
+                                <span class="dot dot-red"></span>
+                                <span class="dot dot-yellow"></span>
+                                <span class="dot dot-green"></span>
+                            </div>
+                            <span class="window-filename" id="window-filename">ejemplo.py</span>
+                            <span class="window-badge">✏️ Modo Editable</span>
+                        </div>
+                        <div class="code-editor-container">
+                            <textarea id="code-editor" class="code-editor" spellcheck="false"
+                                placeholder="Escribe o edita tu código aquí..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Terminal Output Window -->
+                    <div class="code-terminal" id="code-terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-title">
+                                <span class="terminal-icon">🖥️</span>
+                                <span>Consola de Salida / Terminal</span>
+                            </div>
+                            <div class="terminal-status-badge" id="terminal-status-badge">
+                                ⚪ Listo para ejecutar
+                            </div>
+                        </div>
+                        <div class="terminal-body" id="terminal-body">
+                            <span class="term-dim">Presiona "▶️ Compilar & Ejecutar" arriba para ver la salida de este
+                                programa.</span>
+                        </div>
+                    </div>
+
+                    <!-- Code Explanation Panel -->
+                    <div class="code-explanation-card">
+                        <h3>💡 Explicación Didáctica para Estudiantes</h3>
+                        <p id="code-explanation-text">
+                            Selecciona un lenguaje y un tema arriba para ver la explicación detallada de cada línea de
+                            código.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Calculadora de Calificaciones -->
+        <section class="section tab-view" id="calculadora">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Calculadora de Promedio de Calificaciones</h2>
+                    <p class="section-subtitle">
+                        Herramienta integrada para que los estudiantes calculen su nota final y verifiquen su estado de
+                        aprobación.
+                    </p>
+                </div>
+
+                <div class="calc-wrapper">
+                    <div class="calc-card">
+                        <form id="calc-form" onsubmit="return false;">
+                            <div class="form-group">
+                                <label for="input-notas">Ingresa tus calificaciones (separadas por comas):</label>
+                                <input type="text" id="input-notas" class="form-control"
+                                    placeholder="Ejemplo: 7.5, 8.0, 9.5, 6.0" required>
+                                <small class="form-help">Acepta notas decimales con punto o coma (ejemplo: 6.5, 7.0,
+                                    8.0)</small>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col">
+                                    <label for="input-minima">Nota mínima de aprobación:</label>
+                                    <input type="number" id="input-minima" class="form-control" value="6.0" min="0"
+                                        max="10" step="0.5">
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btn-calcular" class="btn btn-primary btn-block">
+                                🧮 Calcular Promedio Final
+                            </button>
+                        </form>
+
+                        <!-- Calculation Results Output -->
+                        <div class="calc-results hidden" id="calc-results">
+                            <div class="result-badge-container">
+                                <div class="result-badge" id="result-status-badge">Aprobado</div>
+                            </div>
+
+                            <div class="result-metrics">
+                                <div class="metric-box">
+                                    <span class="metric-label">Promedio Final</span>
+                                    <span class="metric-value" id="res-promedio">0.00</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-label">Total de Notas</span>
+                                    <span class="metric-value" id="res-total">0</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-label">Nota Más Alta</span>
+                                    <span class="metric-value" id="res-max">0.00</span>
+                                </div>
+                                <div class="metric-box">
+                                    <span class="metric-label">Nota Más Baja</span>
+                                    <span class="metric-value" id="res-min">0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Desafíos / Quiz para Estudiantes -->
+        <section class="section bg-alt tab-view" id="quiz">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Pon a Prueba tus Conocimientos (Quiz)</h2>
+                    <p class="section-subtitle">
+                        Responde preguntas interactivas de los 8 lenguajes y demuestra tu nivel en programación.
+                    </p>
+                </div>
+
+                <div class="quiz-container">
+                    <div class="quiz-card" id="quiz-card">
+                        <div class="quiz-header">
+                            <span class="quiz-tag" id="quiz-lang-tag">Python 🐍</span>
+                            <span class="quiz-counter" id="quiz-counter">Pregunta 1 de 5</span>
+                        </div>
+
+                        <h3 class="quiz-question" id="quiz-question-text">
+                            ¿Cuál es la función principal en Python para mostrar texto en pantalla?
+                        </h3>
+
+                        <div class="quiz-options" id="quiz-options">
+                            <!-- Options rendered dynamically -->
+                        </div>
+
+                        <div class="quiz-feedback hidden" id="quiz-feedback">
+                            <p id="quiz-feedback-text"></p>
+                        </div>
+
+                        <div class="quiz-footer">
+                            <button id="btn-next-quiz" class="btn btn-primary btn-sm hidden">Siguiente Pregunta
+                                ➡️</button>
+                        </div>
+                    </div>
+                </div>
+        <!-- Section: Dashboard Administrativo -->
+        <section class="section tab-view" id="admin-dashboard">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">👑 Dashboard Administrativo & Control Académico</h2>
+                    <p class="section-subtitle">
+                        Supervisa el rendimiento de los estudiantes registrados, gestiona permisos, restablece accesos y analiza el avance por lenguaje de programación.
+                    </p>
+                </div>
+
+                <!-- KPI Cards Row -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #38bdf8;">👥</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-total-users">0</div>
+                            <div class="kpi-label">Estudiantes Registrados</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #10b981;">✅</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-total-lessons">0</div>
+                            <div class="kpi-label">Cursos Aprobados Globales</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #f59e0b;">🏆</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-avg-score">0 pts</div>
+                            <div class="kpi-label">Promedio de Puntos Quiz</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #818cf8;">⚡</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-top-lang">Python</div>
+                            <div class="kpi-label">Lenguaje Principal</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tools Bar -->
+                <div class="admin-toolbar-card">
+                    <div class="admin-toolbar-search">
+                        <div class="search-box-wrapper" style="width: 100%;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="admin-search-input" class="search-input"
+                                placeholder="Buscar por estudiante o correo...">
+                        </div>
+                    </div>
+
+                    <div class="admin-toolbar-actions">
+                        <button id="btn-admin-add-user" class="btn btn-primary btn-sm">
+                            ➕ Registrar Alumno
+                        </button>
+                        <button id="btn-admin-export-csv" class="btn btn-secondary btn-sm">
+                            📥 Exportar CSV
+                        </button>
+                        <button id="btn-admin-export-json" class="btn btn-secondary btn-sm">
+                            📥 Exportar JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Users Management Table -->
+                <div class="admin-table-card">
+                    <div class="admin-table-header">
+                        <h4>👥 Lista de Estudiantes y Estado Académico</h4>
+                        <small style="color: var(--text-muted);">Haz clic en "⚡ Desbloquear Todo" para conceder acceso maestro a un estudiante.</small>
+                    </div>
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="admin-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Correo / Usuario</th>
+                                    <th>Lenguaje Activo</th>
+                                    <th>Cursos Aprobados</th>
+                                    <th>Nivel</th>
+                                    <th>Acciones Administrador</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-table-body">
+                                <!-- Inyectado dinámicamente desde JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Global Languages Analytics Card -->
+                <div class="admin-analytics-card">
+                    <h4>📊 Avance Global de la Clase por Lenguajes de Programación</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Porcentaje medio de cursos completados por los alumnos en cada tecnología.</p>
+                    <div id="admin-language-analytics-list" class="admin-analytics-grid">
+                        <!-- Inyectado dinámicamente desde JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <a href="#hero" class="footer-logo">⚡ DevHub<span class="highlight">FP</span></a>
+                <p>Plataforma educativa para estudiantes de Formación Profesional (FP).</p>
+            </div>
+
+            <div class="footer-info">
+                <p><strong>Lenguajes incluidos:</strong> Python, C++, Rust, Node.js, Java, SQL, TypeScript, Solidity.
+                </p>
+                <p class="copyright">&copy; 2026 Proyecto de Programación Estudiantil. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- PDF Viewer Modal -->
+    <div id="pdf-modal-overlay" class="pdf-modal-overlay hidden">
+        <div class="pdf-modal-container">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title-wrapper">
+                    <span class="pdf-modal-icon">📄</span>
+                    <h3 id="pdf-modal-title" class="pdf-modal-title">Documento PDF</h3>
+                </div>
+                <div class="pdf-modal-actions">
+                    <a id="pdf-modal-download" href="#" download class="btn btn-primary btn-sm">⬇️ Descargar PDF</a>
+                    <button id="pdf-modal-close" class="pdf-modal-close-btn">&times;</button>
+                </div>
+            </div>
+            <div class="pdf-modal-body">
+                <iframe id="pdf-modal-iframe" src="" title="Visor de PDF"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Registration & Profile Modal -->
+    <div id="user-modal-overlay" class="pdf-modal-overlay hidden">
+        <div class="user-modal-container">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title-wrapper">
+                    <span class="pdf-modal-icon">👤</span>
+                    <h3 class="pdf-modal-title" id="user-modal-title">Centro de Usuario</h3>
+                </div>
+                <button id="user-modal-close" class="pdf-modal-close-btn">&times;</button>
+            </div>
+
+            <!-- Modal Sub Tabs Navigation -->
+            <div class="auth-tabs">
+                <button id="auth-tab-register" class="auth-tab-btn active">📝 Registro</button>
+                <button id="auth-tab-login" class="auth-tab-btn">🔑 Iniciar Sesión</button>
+                <button id="auth-tab-profile" class="auth-tab-btn">👤 Mi Perfil</button>
+            </div>
+
+            <div class="user-modal-body-content">
+                <!-- VIEW 1: REGISTRO DE USUARIO -->
+                <div id="auth-view-register" class="auth-view-content">
+                    <form id="form-register-user" onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="reg-input-name">Nombre Completo <span class="req">*</span></label>
+                            <input type="text" id="reg-input-name" class="form-control"
+                                placeholder="Ej: Carlos Mendoza" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-input-email">Correo Electrónico o Usuario <span class="req">*</span></label>
+                            <input type="text" id="reg-input-email" class="form-control"
+                                placeholder="Ej: carlos.mendoza@estudiante.fp.edu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-input-password">Contraseña <span class="req">*</span></label>
+                            <div class="input-password-wrapper">
+                                <input type="password" id="reg-input-password" class="form-control"
+                                    placeholder="Crea una contraseña (mínimo 4 caract.)" required minlength="4">
+                                <button type="button" class="btn-toggle-pwd" data-target="reg-input-password" title="Mostrar/ocultar contraseña">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-input-confirm-password">Confirmar Contraseña <span class="req">*</span></label>
+                            <div class="input-password-wrapper">
+                                <input type="password" id="reg-input-confirm-password" class="form-control"
+                                    placeholder="Repite tu contraseña" required minlength="4">
+                                <button type="button" class="btn-toggle-pwd" data-target="reg-input-confirm-password" title="Mostrar/ocultar contraseña">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Selecciona tu Avatar:</label>
+                            <div class="avatar-selector" id="reg-avatar-selector">
+                                <button type="button" class="avatar-btn active" data-avatar="👨‍💻">👨‍💻</button>
+                                <button type="button" class="avatar-btn" data-avatar="👩‍💻">👩‍💻</button>
+                                <button type="button" class="avatar-btn" data-avatar="⚡">⚡</button>
+                                <button type="button" class="avatar-btn" data-avatar="🤖">🤖</button>
+                                <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+                                <button type="button" class="avatar-btn" data-avatar="💻">💻</button>
+                                <button type="button" class="avatar-btn" data-avatar="🧠">🧠</button>
+                                <button type="button" class="avatar-btn" data-avatar="🎓">🎓</button>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-submit-register" class="btn btn-primary btn-block">
+                            ✨ Registrarse e Iniciar Sesión
+                        </button>
+                        <p class="auth-switch-prompt">
+                            ¿Ya tienes cuenta? <a href="#" id="link-go-login">Inicia sesión aquí</a>
+                        </p>
+                    </form>
+                </div>
+
+                <!-- VIEW 2: INICIAR SESIÓN -->
+                <div id="auth-view-login" class="auth-view-content hidden">
+                    <form id="form-login-user" onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="login-input-email">Correo Electrónico o Usuario</label>
+                            <input type="text" id="login-input-email" class="form-control"
+                                placeholder="Ej: carlos.mendoza@estudiante.fp.edu" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-input-password">Contraseña</label>
+                            <div class="input-password-wrapper">
+                                <input type="password" id="login-input-password" class="form-control"
+                                    placeholder="Tu contraseña" required>
+                                <button type="button" class="btn-toggle-pwd" data-target="login-input-password" title="Mostrar/ocultar contraseña">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-submit-login" class="btn btn-primary btn-block">
+                            🚀 Entrar a Mi Cuenta
+                        </button>
+                    </form>
+
+                    <!-- Acceso rápido a cuentas registradas localmente -->
+                    <div class="quick-users-section" id="quick-users-section">
+                        <h5>👥 Cuentas Guardadas en este Navegador</h5>
+                        <div class="quick-users-list" id="quick-users-list">
+                            <!-- Inyectado dinámicamente con JS -->
+                        </div>
+                    </div>
+
+                    <p class="auth-switch-prompt">
+                        ¿No tienes una cuenta? <a href="#" id="link-go-register">Regístrate gratis aquí</a>
+                    </p>
+                </div>
+
+                <!-- VIEW 3: MI PERFIL Y ESTADÍSTICAS -->
+                <div id="auth-view-profile" class="auth-view-content hidden">
+                    <div class="profile-header-card">
+                        <div class="profile-avatar-large" id="profile-avatar-display">👨‍💻</div>
+                        <div class="profile-info-details">
+                            <h3 id="profile-name-display">Carlos Mendoza</h3>
+                            <p id="profile-email-display" class="text-muted">carlos.mendoza@estudiante.fp.edu</p>
+                        </div>
+                    </div>
+
+                    <form id="user-profile-edit-form" onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="user-input-name">Nombre del Estudiante:</label>
+                            <input type="text" id="user-input-name" class="form-control" placeholder="Nombre completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-input-email">Correo Electrónico:</label>
+                            <input type="text" id="user-input-email" class="form-control" placeholder="Correo electrónico">
+                        </div>
+                        <div class="form-group">
+                            <label>Cambiar Avatar:</label>
+                            <div class="avatar-selector" id="edit-avatar-selector">
+                                <button type="button" class="avatar-btn active" data-avatar="👨‍💻">👨‍💻</button>
+                                <button type="button" class="avatar-btn" data-avatar="👩‍💻">👩‍💻</button>
+                                <button type="button" class="avatar-btn" data-avatar="⚡">⚡</button>
+                                <button type="button" class="avatar-btn" data-avatar="🤖">🤖</button>
+                                <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+                                <button type="button" class="avatar-btn" data-avatar="💻">💻</button>
+                                <button type="button" class="avatar-btn" data-avatar="🧠">🧠</button>
+                                <button type="button" class="avatar-btn" data-avatar="🎓">🎓</button>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-save-user" class="btn btn-primary btn-block">
+                            💾 Guardar Cambios del Perfil
+                        </button>
+                    </form>
+
+                    <div class="user-stats-card">
+                        <h4>📊 Tu Progreso Global de Aprendizaje</h4>
+                        <div class="user-progress-bar-wrapper">
+                            <div class="user-progress-bar-bg">
+                                <div class="user-progress-bar-fill" id="user-global-progress-fill" style="width: 0%;"></div>
+                            </div>
+                            <span class="user-progress-percent" id="user-global-progress-percent">0% Completado</span>
+                        </div>
+                        <div class="user-stats-grid">
+                            <div class="stat-box">
+                                <span class="stat-num" id="stat-lessons-completed">0 / 30</span>
+                                <span class="stat-label">Lecciones Completadas</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-num" id="stat-quiz-score">0 pts</span>
+                                <span class="stat-label">Puntos de Quiz</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-num" id="stat-current-level">Nivel 1</span>
+                                <span class="stat-label">Nivel de Aprendiz</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions-row">
+                        <button type="button" id="btn-modal-logout" class="btn btn-danger-soft btn-block">
+                            🚪 Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Window Modal (Ejemplo + Ejercicio por Lenguaje) -->
+    <div id="practice-modal-overlay" class="pdf-modal-overlay hidden">
+        <div class="practice-modal-container">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title-wrapper">
+                    <span class="pdf-modal-icon">💻</span>
+                    <div>
+                        <h3 id="practice-modal-title" class="pdf-modal-title">Práctica del Curso</h3>
+                        <small id="practice-modal-subtitle" style="color: var(--text-muted); font-size: 0.8rem;">Ejemplo
+                            Guiado & Ejercicio Evaluado en Compilador</small>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <select id="practice-lang-select" class="form-control"
+                        style="padding: 4px 10px; font-size: 0.85rem; width: auto; background: #0b152d;">
+                        <option value="python">🐍 Python</option>
+                        <option value="cpp">⚙️ C++</option>
+                        <option value="rust">🦀 Rust</option>
+                        <option value="node">🟢 Node.js</option>
+                        <option value="java">☕ Java</option>
+                        <option value="sql">🗄️ SQL</option>
+                        <option value="typescript">🟦 TypeScript</option>
+                        <option value="solidity">⛓️ Solidity</option>
+                    </select>
+                    <button id="practice-modal-close" class="pdf-modal-close-btn">&times;</button>
+                </div>
+            </div>
+            <div class="practice-modal-body">
+                <!-- Inner Sub Tabs -->
+                <div class="practice-tabs">
+                    <button id="practice-tab-example" class="practice-tab-btn active">📖 1. Ejemplo Guiado</button>
+                    <button id="practice-tab-exercise" class="practice-tab-btn">📝 2. Ejercicio Evaluado (Aprobar
+                        Curso)</button>
+                </div>
+
+                <!-- Tab 1: Guided Example Content -->
+                <div id="practice-view-example" class="practice-view-content">
+                    <div class="code-controls" style="margin-bottom: 12px; justify-content: flex-end;">
+                        <button id="btn-run-practice-example" class="btn btn-primary btn-sm">▶️ Compilar & Ejecutar
+                            Ejemplo</button>
+                    </div>
+                    <div class="code-window">
+                        <div class="window-header">
+                            <span class="window-filename" id="example-filename">ejemplo_guiado.py</span>
+                            <span class="window-badge">📖 Código de Ejemplo</span>
+                        </div>
+                        <div class="code-editor-container">
+                            <textarea id="practice-example-editor" class="code-editor" spellcheck="false"></textarea>
+                        </div>
+                    </div>
+                    <div class="code-terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-title">🖥️ Consola de Salida del Ejemplo</div>
+                        </div>
+                        <div class="terminal-body" id="practice-example-terminal">
+                            <span class="term-dim">Presiona "▶️ Compilar & Ejecutar Ejemplo" arriba.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Exercise Content -->
+                <div id="practice-view-exercise" class="practice-view-content hidden">
+                    <div class="exercise-prompt-card">
+                        <h4>📋 Enunciado del Ejercicio Práctico</h4>
+                        <p id="exercise-prompt-text">Crea un programa que imprima el resultado solicitado para resolver
+                            este tema de estudio.</p>
+                    </div>
+                    <div class="code-controls" style="margin-bottom: 12px; justify-content: space-between;">
+                        <button id="btn-run-practice-exercise" class="btn btn-secondary btn-sm">▶️ Probar
+                            Código</button>
+                        <button id="btn-eval-practice-exercise" class="btn btn-primary btn-sm">🚀 Evaluar & Aprobar
+                            Curso</button>
+                    </div>
+                    <div class="code-window">
+                        <div class="window-header">
+                            <span class="window-filename" id="exercise-filename">ejercicio_estudiante.py</span>
+                            <span class="window-badge">✏️ Completa tu Solución</span>
+                        </div>
+                        <div class="code-editor-container">
+                            <textarea id="practice-exercise-editor" class="code-editor" spellcheck="false"
+                                placeholder="Escribe aquí tu solución al ejercicio..."></textarea>
+                        </div>
+                    </div>
+                    <div class="code-terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-title">🖥️ Consola & Evaluación del Ejercicio</div>
+                            <div id="exercise-status-badge" class="terminal-status-badge">⚪ Sin evaluar</div>
+                        </div>
+                        <div class="terminal-body" id="practice-exercise-terminal">
+                            <span class="term-dim">Presiona "🚀 Evaluar & Aprobar Curso" cuando estés listo para
+                                verificar tu código.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin User Modal (Añadir / Editar Estudiante) -->
+    <div id="admin-user-modal-overlay" class="pdf-modal-overlay hidden">
+        <div class="user-modal-container">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title-wrapper">
+                    <span class="pdf-modal-icon">👑</span>
+                    <h3 class="pdf-modal-title" id="admin-user-modal-title">Gestión de Estudiante</h3>
+                </div>
+                <button id="admin-user-modal-close" class="pdf-modal-close-btn">&times;</button>
+            </div>
+            <div class="user-modal-body-content">
+                <form id="admin-user-form" onsubmit="return false;">
+                    <input type="hidden" id="admin-edit-user-id" value="">
+                    <div class="form-group">
+                        <label for="admin-input-name">Nombre Completo <span class="req">*</span></label>
+                        <input type="text" id="admin-input-name" class="form-control" placeholder="Nombre completo del alumno" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-input-email">Correo Electrónico o Usuario <span class="req">*</span></label>
+                        <input type="text" id="admin-input-email" class="form-control" placeholder="carlos@estudiante.fp.edu" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-input-password">Contraseña <span class="req">*</span></label>
+                        <input type="text" id="admin-input-password" class="form-control" placeholder="Contraseña de acceso" required minlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Avatar del Alumno:</label>
+                        <div class="avatar-selector" id="admin-avatar-selector">
+                            <button type="button" class="avatar-btn active" data-avatar="👨‍💻">👨‍💻</button>
+                            <button type="button" class="avatar-btn" data-avatar="👩‍💻">👩‍💻</button>
+                            <button type="button" class="avatar-btn" data-avatar="⚡">⚡</button>
+                            <button type="button" class="avatar-btn" data-avatar="🤖">🤖</button>
+                            <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+                            <button type="button" class="avatar-btn" data-avatar="🎓">🎓</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="background: rgba(0, 102, 255, 0.1); border: 1px solid var(--border-glow); padding: 12px; border-radius: var(--radius-md);">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--secondary);">
+                            <input type="checkbox" id="admin-check-unlock-all" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                            <span>⚡ <strong>Desbloqueo Maestro:</strong> Otorgar acceso inmediato a los 8 lenguajes</span>
+                        </label>
+                    </div>
+                    <button type="submit" id="btn-admin-save-user" class="btn btn-primary btn-block">
+                        💾 Guardar Registro de Estudiante
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate Generator Modal -->
+    <div id="certificate-modal-overlay" class="pdf-modal-overlay hidden">
+        <div class="certificate-modal-container">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title-wrapper">
+                    <span class="pdf-modal-icon">📜</span>
+                    <h3 class="pdf-modal-title">Certificado Académico de Programación</h3>
+                </div>
+                <button id="certificate-modal-close" class="pdf-modal-close-btn">&times;</button>
+            </div>
+
+            <div class="certificate-modal-body">
+                <!-- Diploma Card -->
+                <div class="diploma-card" id="diploma-card">
+                    <div class="diploma-border">
+                        <div class="diploma-header">
+                            <div class="diploma-badge-icon">⚡</div>
+                            <h2 class="diploma-institution">DEVHUB FP • FORMACIÓN PROFESIONAL</h2>
+                            <span class="diploma-subtitle">ACADEMIA DE PROGRAMACIÓN Y DESARROLLO DE SOFTWARE</span>
+                        </div>
+
+                        <div class="diploma-body">
+                            <p class="diploma-text-grant">Se otorga el presente Certificado de Excelencia Técnica a:</p>
+                            <h1 class="diploma-student-name" id="cert-student-name">Estudiante DevHub</h1>
+                            <p class="diploma-text-desc">Por haber completado con éxito la ruta de aprendizaje completa y los 28 módulos prácticos de:</p>
+                            <h2 class="diploma-course-title" id="cert-course-title">🐍 Programación Avanzada en Python</h2>
+                            <div class="diploma-meta-row">
+                                <div><strong>Estado Académico:</strong> Aprobado con Excelencia</div>
+                                <div><strong>Fecha de Emisión:</strong> <span id="cert-date-display">17/08/2026</span></div>
+                                <div><strong>Código de Verificación:</strong> <span id="cert-code-display">FP-884920</span></div>
+                            </div>
+                        </div>
+
+                        <div class="diploma-footer">
+                            <div class="diploma-sign">
+                                <div class="sign-line">DevHub Academic Board</div>
+                                <small>Firma Coordinador FP</small>
+                            </div>
+                            <div class="diploma-seal">
+                                <span>🎓</span>
+                                <small>SELLO OFICIAL</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="certificate-actions-row">
+                    <button id="btn-print-certificate" class="btn btn-primary btn-block" style="background: linear-gradient(135deg, #0066ff, #00ccff);">
+                        🖨️ Imprimir / Guardar como PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Compartir Enlace & Código QR (iPhone & Android) -->
+    <div id="share-link-modal-overlay" class="pdf-modal-overlay hidden">
+        <div class="user-modal-container" style="max-width: 520px; text-align: center;">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title-wrapper">
+                    <span class="pdf-modal-icon">🔗</span>
+                    <h3 class="pdf-modal-title">Compartir Enlace & Código QR</h3>
+                </div>
+                <button id="share-link-modal-close" class="pdf-modal-close-btn">&times;</button>
+            </div>
+            <div class="user-modal-body-content" style="padding: 20px;">
+                <!-- Page Link & QR Code Display -->
+                <div id="modal-view-qr">
+                    <div style="background: rgba(0, 102, 255, 0.1); border: 1px solid var(--border-glow); border-radius: var(--radius-md); padding: 12px; margin-bottom: 14px; text-align: left;">
+                        <h5 style="margin: 0 0 4px 0; color: var(--secondary); font-size: 0.85rem;">📲 Escanea con tu Cámara (iPhone / Android):</h5>
+                        <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted);">
+                            Apunta la cámara de tu celular a la imagen para abrir la página. Si estás en una red Wi-Fi local, puedes reemplazar <code>localhost</code> por la IP de tu PC.
+                        </p>
+                    </div>
+
+                    <div class="qr-generator-wrapper" style="margin-bottom: 14px;">
+                        <div class="qr-code-box-frame" style="background: #ffffff; padding: 10px; border-radius: 12px;">
+                            <img id="modal-qr-page-img" src="" alt="Código QR del Vínculo de la Página" class="qr-generated-image" style="width: 220px; height: 220px; display: block; border-radius: 4px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+                        <label for="share-page-url-input" style="font-weight: 700; color: var(--text-main); font-size: 0.82rem;">URL Codificada en el QR (Modificable en tiempo real):</label>
+                        <div style="display: flex; gap: 8px; margin-top: 4px;">
+                            <input type="text" id="share-page-url-input" class="form-control" style="font-family: 'Fira Code', monospace; font-size: 0.82rem; background: rgba(0,0,0,0.4);" placeholder="http://192.168.1.15:8080/">
+                            <button id="btn-copy-share-url" class="btn btn-primary btn-sm" style="white-space: nowrap;">
+                                📋 Copiar Enlace
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button id="btn-native-share-action" class="btn btn-primary btn-block">
+                            📲 Compartir Enlace (WhatsApp / Redes)
+                        </button>
+                        <div style="display: flex; gap: 10px;">
+                            <a id="btn-whatsapp-share" href="#" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; background: rgba(37, 211, 102, 0.15); border-color: #25d366; color: #25d366; font-weight: 700;">
+                                💬 WhatsApp
+                            </a>
+                            <a id="btn-email-share" href="#" class="btn btn-secondary btn-sm" style="flex: 1; font-weight: 700;">
+                                ✉️ Correo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
