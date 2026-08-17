@@ -3376,3 +3376,12 @@ body.auth-locked > :not(#user-modal-overlay):not(#toast-container) {
     max-height: 100px;
     overflow-y: auto;
 }
+
+/* Desktop Centering Layout (> 768px) */
+@media (min-width: 769px) {
+    main, header.hero-section {
+        margin-left: 270px !important;
+        width: calc(100% - 270px) !important;
+        box-sizing: border-box !important;
+    }
+}
