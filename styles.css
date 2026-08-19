@@ -285,6 +285,68 @@
     border-color: #0284c7 !important;
 }
 
+[data-theme="light"] .split-panel,
+[data-theme="light"] .courses-selector-bar,
+[data-theme="light"] .quiz-card,
+[data-theme="light"] .calc-card,
+[data-theme="light"] .visor-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .split-panel .panel-header {
+    background: #f1f5f9 !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .split-panel .panel-title {
+    color: #0284c7 !important;
+}
+
+[data-theme="light"] .editor-wrapper textarea {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .terminal-wrapper {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .terminal-wrapper .terminal-header {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .terminal-wrapper .terminal-body {
+    color: #0369a1 !important;
+}
+
+[data-theme="light"] .test-runner-card {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .test-case-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .markdown-content pre {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .markdown-content code {
+    background: #e2e8f0 !important;
+    color: #0284c7 !important;
+}
+
 :root {
     /* Transitions & Shadows */
     --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
