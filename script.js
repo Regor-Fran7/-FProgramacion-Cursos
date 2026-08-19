@@ -1947,6 +1947,8 @@ function handleUserRegistration(e) {
         avatar: selectedAvatar,
         completedLessons: [],
         quizPoints: 0,
+        isAdmin: (emailVal === 'admin@fp.edu'),
+        masterUnlocked: (emailVal === 'admin@fp.edu'),
         createdAt: new Date().toISOString()
     };
 
@@ -1955,7 +1957,14 @@ function handleUserRegistration(e) {
     setCurrentUserId(newUser.id);
     userProfile = newUser;
 
+    currentCourseLang = 'cpp';
+    currentCourseLevel = 'c1';
+
     saveUserProfile();
+    updateLanguageSelectorUI();
+    if (typeof initLanguagesGrid === 'function') initLanguagesGrid();
+    if (typeof renderMisCursosModule === 'function') renderMisCursosModule();
+
     showToast(`✨ ¡Cuenta creada exitosamente! Bienvenido/a, ${nameVal}`, 'success');
     switchAuthTab('profile');
 }
@@ -1987,7 +1996,17 @@ function handleUserLogin(e) {
 
     setCurrentUserId(user.id);
     userProfile = user;
+    if (!isAdminUser(userProfile)) {
+        userProfile.masterUnlocked = false;
+        if (!isLanguageUnlocked(currentCourseLang)) {
+            currentCourseLang = 'cpp';
+            currentCourseLevel = 'c1';
+        }
+    }
     saveUserProfile();
+    updateLanguageSelectorUI();
+    if (typeof initLanguagesGrid === 'function') initLanguagesGrid();
+    if (typeof renderMisCursosModule === 'function') renderMisCursosModule();
 
     showToast(`🚀 ¡Bienvenido de nuevo, ${user.name}!`, 'success');
     switchAuthTab('profile');
@@ -1997,7 +2016,12 @@ function handleUserLogin(e) {
 function handleUserLogout() {
     setCurrentUserId(null);
     userProfile = { ...DEFAULT_GUEST_PROFILE };
+    currentCourseLang = 'cpp';
+    currentCourseLevel = 'c1';
     updateUserProfileUI();
+    updateLanguageSelectorUI();
+    if (typeof initLanguagesGrid === 'function') initLanguagesGrid();
+    if (typeof renderMisCursosModule === 'function') renderMisCursosModule();
     if (typeof renderPdfGrid === 'function') {
         renderPdfGrid();
     }
