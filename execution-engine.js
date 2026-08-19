@@ -385,6 +385,16 @@ const ExecutionEngine = (function () {
             };
         }
 
+        function cleanCompareText(str) {
+            if (!str) return '';
+            return String(str)
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[¡!¿?.,;:_\-"']/g, ' ')
+                .replace(/\s+/g, ' ')
+                .toLowerCase()
+                .trim();
+        }
+
         let passedCount = 0;
         let testResults = [];
 
@@ -394,7 +404,13 @@ const ExecutionEngine = (function () {
             const outputText = execResult.logs.join('\n');
             const expectedStr = String(tc.expectedOutput).trim();
 
-            const isPassed = !execResult.isError && outputText.toLowerCase().includes(expectedStr.toLowerCase());
+            const cleanActual = cleanCompareText(outputText);
+            const cleanExpected = cleanCompareText(expectedStr);
+
+            const matchExact = outputText.toLowerCase().includes(expectedStr.toLowerCase());
+            const matchClean = cleanActual.length > 0 && cleanExpected.length > 0 && (cleanActual.includes(cleanExpected) || cleanExpected.includes(cleanActual));
+
+            const isPassed = !execResult.isError && (matchExact || matchClean);
             if (isPassed) passedCount++;
 
             testResults.push({

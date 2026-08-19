@@ -3843,7 +3843,8 @@ function renderTestCaseResults(res) {
     listEl.innerHTML = res.results.map(r => `
         <div class="test-case-item ${r.passed ? 'passed' : 'failed'}">
             <div>
-                <strong>Caso ${r.index || 1}:</strong> Esperado: <code>${r.expected}</code>
+                <strong>Caso ${r.index || 1}:</strong> Esperado: <code>${escapeHtml(r.expected)}</code>
+                ${!r.passed && r.actual ? `<div style="font-size: 0.85rem; color: #ef4444; margin-top: 4px;">Obtenido: <code>${escapeHtml(r.actual.trim())}</code></div>` : ''}
             </div>
             <div>
                 ${r.passed ? '✅ PASÓ' : '❌ FALLÓ'}
