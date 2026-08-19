@@ -1746,17 +1746,23 @@ function updateUserProfileUI() {
         if (btnOpenModal) btnOpenModal.classList.remove('hidden');
         if (btnLogoutNav) btnLogoutNav.classList.remove('hidden');
 
+        const btnToggleDocente = document.getElementById('btn-toggle-docente-admin');
         if (isAdminUser(userProfile)) {
             if (navLinkAdmin) navLinkAdmin.classList.remove('hidden');
+            if (btnToggleDocente) btnToggleDocente.classList.remove('hidden');
             if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
         } else {
             if (navLinkAdmin) navLinkAdmin.classList.add('hidden');
+            if (btnToggleDocente) btnToggleDocente.classList.add('hidden');
+            isDocenteAdminMode = false;
         }
 
         if (nameMini) nameMini.textContent = userProfile.name || 'Estudiante';
         if (avatarMini) avatarMini.textContent = userProfile.avatar || '👨‍💻';
         if (levelBadge) levelBadge.textContent = isAdminUser(userProfile) ? 'Docente Master' : `Nivel ${currentLevel}`;
     } else {
+        const btnToggleDocente = document.getElementById('btn-toggle-docente-admin');
+        if (btnToggleDocente) btnToggleDocente.classList.add('hidden');
         if (guestActions) guestActions.classList.remove('hidden');
         if (userBadge) userBadge.classList.add('hidden');
         if (btnOpenModal) btnOpenModal.classList.add('hidden');
@@ -3504,11 +3510,13 @@ const LANGUAGE_PROGRESSION_SEQUENCE = [
 let isDocenteAdminMode = localStorage.getItem('devhub_docente_admin_mode') === 'true';
 
 function isLanguageUnlocked(langId) {
-    if (isDocenteAdminMode) return true; // 👑 Modo Docente/Administrador: ¡Todo Desbloqueado!
-    
+    if (isAdminUser(userProfile)) {
+        if (isDocenteAdminMode || userProfile.masterUnlocked) return true; // 👑 Modo Docente/Administrador
+    }
+
     const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
     if (idx <= 0) return true; // C++ is unlocked by default!
-    
+
     const prevLangId = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1].id;
     return isLanguageCompleted(prevLangId);
 }
@@ -3518,6 +3526,13 @@ function initDocenteAdminToggle() {
     if (!btn) return;
 
     function updateBtnUI() {
+        if (!isAdminUser(userProfile)) {
+            btn.classList.add('hidden');
+            return;
+        } else {
+            btn.classList.remove('hidden');
+        }
+
         if (isDocenteAdminMode) {
             btn.textContent = '👑 Modo Docente: ACTIVADO (Todo Desbloqueado)';
             btn.className = 'btn btn-primary btn-sm';
@@ -3529,12 +3544,14 @@ function initDocenteAdminToggle() {
             btn.className = 'btn btn-outline btn-sm';
             btn.style.borderColor = '#f59e0b';
             btn.style.color = '#f59e0b';
+            btn.style.background = 'transparent';
         }
     }
 
     updateBtnUI();
 
     btn.addEventListener('click', () => {
+        if (!isAdminUser(userProfile)) return;
         isDocenteAdminMode = !isDocenteAdminMode;
         localStorage.setItem('devhub_docente_admin_mode', isDocenteAdminMode ? 'true' : 'false');
         updateBtnUI();
