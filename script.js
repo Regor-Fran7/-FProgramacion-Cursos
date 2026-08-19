@@ -3093,268 +3093,392 @@ function initPracticeModalSystem() {
 }
 
 /* ==========================================================================
-   MIS CURSOS - EMBEDDED CURRICULUM DATA
+   MIS CURSOS - EMBEDDED CURRICULUM DATA (4 CURSOS POR LENGUAJE)
    ========================================================================== */
 const EMBEDDED_CURRICULUM_DATA = {
   "modules": [
     {
-      "id": "py-basico",
-      "lang": "python",
-      "level": "basico",
-      "title": "01. Lógica, Algoritmos e I/O Primitivo en Python",
-      "theoryMarkdown": "### Fundamento Teórico (Adaptación PDF 1)\nUn **algoritmo** es una secuencia finita, definida y precisa de pasos con Entrada, Proceso y Salida. En Python, la entrada y salida de datos se realiza con `input()` y `print()`.\n\n### Tipos de Datos Primitivos\n- **int:** Enteros (`15`, `-5`).\n- **float:** Decimales (`3.14`).\n- **str:** Cadenas (`'Hola'`).\n- **bool:** Lógicos (`True`, `False`).\n\n### Ejemplo de Operadores y Ternario\n```python\nbolsas = 4\nprecio = 25 if bolsas >= 3 else 35\ntotal = bolsas * precio\nprint(f'Total a pagar: {total}')\n```\n\n> ⚠️ **Antipatrón a evitar:** Olvidar que `input()` siempre retorna un `str`, por lo que se requiere convertir explícitamente con `int()` o `float()` antes de operar numéricamente.",
-      "initialCode": "# Programa de Cálculo de Precio basado en el algoritmo del PDF\nbolsas = 4\nprecio = 25 if bolsas >= 3 else 35\ntotal = bolsas * precio\nprint(f\"El total a pagar es: {total}\")",
+      "id": "cpp-c1",
+      "lang": "cpp",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en C++",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en C++\nC++ requiere la directiva `#include <iostream>` y la función principal `int main()` como punto de entrada ejecutable. La salida de mensajes a consola se realiza mediante `cout <<`.\n\n```cpp\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"¡Hola Mundo desde C++!\" << endl;\n    cout << \"Bienvenidos al curso de Programacion FP.\" << endl;\n    return 0;\n}\n```",
+      "initialCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"¡Hola Mundo desde C++!\" << endl;\n    cout << \"Bienvenidos al curso de Programacion FP.\" << endl;\n    return 0;\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde C++!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué directiva se incluye obligatoriamente en C++ para usar 'cout'?", "options": ["#include <iostream>", "#include <stdio.h>", "#include <string>", "import iostream"], "correctIndex": 0, "explanation": "<iostream> define los flujos estándar de entrada y salida." }
+      ]
+    },
+    {
+      "id": "cpp-c2",
+      "lang": "cpp",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en C++",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en C++\nC++ es un lenguaje fuertemente tipado. Toda variable debe ser declarada especificando su tipo (`int`, `double`, `char`, `string`, `bool`).\n\n```cpp\n#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string nombre = \"Carlos\";\n    int edad = 20;\n    double promedio = 9.5;\n    cout << nombre << \" - Edad: \" << edad << \" - Nota: \" << promedio << endl;\n    return 0;\n}\n```",
+      "initialCode": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string nombre = \"Carlos\";\n    int edad = 20;\n    double promedio = 9.5;\n    cout << nombre << \" - Edad: \" << edad << \" - Nota: \" << promedio << endl;\n    return 0;\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos - Edad: 20 - Nota: 9.5" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué tipo de dato de C++ almacena números con punto decimal?", "options": ["double / float", "int", "bool", "char"], "correctIndex": 0, "explanation": "double y float almacenan valores reales o decimales." }
+      ]
+    },
+    {
+      "id": "cpp-c3",
+      "lang": "cpp",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en C++",
+      "theoryMarkdown": "### 3. Condiciones y Bucles en C++\nPermiten la toma de decisiones con `if / else` y la repetición con bucles `for` o `while`.\n\n```cpp\n#include <iostream>\nusing namespace std;\n\nint main() {\n    int bolsas = 4;\n    int precio = (bolsas >= 3) ? 25 : 35;\n    int total = bolsas * precio;\n    cout << \"El total a pagar es: \" << total << endl;\n    return 0;\n}\n```",
+      "initialCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int bolsas = 4;\n    int precio = (bolsas >= 3) ? 25 : 35;\n    int total = bolsas * precio;\n    cout << \"El total a pagar es: \" << total << endl;\n    return 0;\n}",
       "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
       "quiz": [
-        { "id": 1, "question": "¿Cuáles son las 4 características fundamentales de un algoritmo según el PDF?", "options": ["Finito, definido, secuencial y preciso", "Infinito, aleatorio, paralelo y abstracto", "Rápido, gráfico, numérico y dinámico", "Compilado, privado, síncrono y estático"], "correctIndex": 0, "explanation": "El PDF establece que todo algoritmo debe ser finito, definido, secuencial y preciso." },
-        { "id": 2, "question": "¿Qué retorna por defecto la función nativa input() en Python?", "options": ["int", "float", "str", "bool"], "correctIndex": 2, "explanation": "input() siempre captura la entrada del usuario como una cadena str." },
-        { "id": 3, "question": "¿Qué evalúa el operador condicional ternario '25 if bolsas >= 3 else 35'?", "options": ["Asigna 25 si bolsas es 3 o más; de lo contrario asigna 35", "Asigna siempre 35", "Genera un error de sintaxis", "Compara direcciones de memoria"], "correctIndex": 0, "explanation": "Es la sintaxis compacta de decisión rápida en Python equivalente al operador ternario ? :." }
+        { "id": 1, "question": "¿Qué resultado produce (4 >= 3) ? 25 : 35?", "options": ["25", "35", "100", "0"], "correctIndex": 0, "explanation": "Dado que 4 >= 3 es verdadero, la expresión evalúa a 25." }
       ]
     },
     {
-      "id": "py-intermedio",
-      "lang": "python",
-      "level": "intermedio",
-      "title": "02. Arreglos, Algoritmos de Búsqueda y Ordenamiento Burbuja",
-      "theoryMarkdown": "### Fundamento Teórico (Adaptación PDF 2)\nLos **arreglos (listas)** son colecciones contiguas indexadas desde `0`.\n\n### Algoritmo de Ordenamiento Burbuja (Bubble Sort)\nCompara elementos consecutivos e intercambia posiciones si están desordenados hasta flotar el mayor al final.\n\n```python\nnumeros = [7, 2, 5, 1, 9]\nfor i in range(len(numeros) - 1):\n    for j in range(len(numeros) - 1 - i):\n        if numeros[j] > numeros[j + 1]:\n            numeros[j], numeros[j + 1] = numeros[j + 1], numeros[j]\n```",
-      "initialCode": "# Algoritmo de Ordenamiento Burbuja en Python\nnumeros = [7, 2, 5, 1, 9]\nfor i in range(len(numeros) - 1):\n    for j in range(len(numeros) - 1 - i):\n        if numeros[j] > numeros[j + 1]:\n            numeros[j], numeros[j + 1] = numeros[j + 1], numeros[j]\n\nprint(f\"Arreglo Ordenado: {numeros}\")",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Arreglo Ordenado: [1, 2, 5, 7, 9]" }],
-      "quiz": [
-        { "id": 1, "question": "¿En qué número de índice comienzan los arreglos y listas?", "options": ["1", "0", "-1", "Depende del tamaño"], "correctIndex": 1, "explanation": "El primer elemento de todo arreglo o lista se identifica con el índice 0." },
-        { "id": 2, "question": "¿Qué condición obligatoria requiere la Búsqueda Binaria según el PDF?", "options": ["El arreglo debe estar previamente ordenado", "El arreglo debe ser bidimensional", "Debe tener menos de 5 elementos", "Debe usar valores flotantes"], "correctIndex": 0, "explanation": "La búsqueda binaria requiere que los datos estén ordenados para dividir sucesivamente el rango a la mitad." },
-        { "id": 3, "question": "¿Cómo funciona el algoritmo de Ordenamiento Burbuja?", "options": ["Compara pares consecutivos e intercambia sus valores si están desordenados", "Elimina duplicados de la lista", "Multiplica cada elemento por dos", "Ordena los elementos aleatoriamente"], "correctIndex": 0, "explanation": "Compara elementos contiguos desplazando iterativamente el mayor al extremo del arreglo." }
-      ]
-    },
-    {
-      "id": "py-avanzado",
-      "lang": "python",
-      "level": "avanzado",
-      "title": "03. Gestión de Memoria, Recursión y Funciones de Orden Superior",
-      "theoryMarkdown": "### Fundamento Teórico (Adaptación PDF 2 Avanzado)\nBúsqueda Binaria Recursiva y algoritmos de división y conquista.",
-      "initialCode": "# Algoritmo de Búsqueda Binaria Recursiva\ndef busqueda_binaria(arr, inicio, fin, valor):\n    if inicio > fin: return -1\n    medio = (inicio + fin) // 2\n    if arr[medio] == valor: return medio\n    elif valor < arr[medio]: return busqueda_binaria(arr, inicio, medio - 1, valor)\n    else: return busqueda_binaria(arr, medio + 1, fin, valor)\n\ndatos = [2, 5, 8, 12, 16, 23, 38, 45, 56]\nidx = busqueda_binaria(datos, 0, len(datos) - 1, 16)\nprint(f\"Valor 16 encontrado en el indice: {idx}\")",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Valor 16 encontrado en el indice: 4" }],
-      "quiz": [
-        { "id": 1, "question": "¿Cuál es la complejidad temporal de la Búsqueda Binaria?", "options": ["Logarítmica O(log n)", "Lineal O(n)", "Cuadrática O(n^2)", "Constante O(1)"], "correctIndex": 0, "explanation": "Al descartar la mitad del arreglo en cada paso, su complejidad es O(log n)." }
-      ]
-    },
-    {
-      "id": "cpp-basico",
+      "id": "cpp-c4",
       "lang": "cpp",
-      "level": "basico",
-      "title": "01. Fundamentos de C++, I/O y Operadores Aritméticos/Relacionales",
-      "theoryMarkdown": "### Fundamento Teórico (PDF 1)\nC++ es un lenguaje compilado sensible a mayúsculas con sintaxis estricta delimitada por `;`.",
-      "initialCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 10, b = 5;\n    int suma = a + b;\n    int modulo = a % b;\n    cout << \"Suma: \" << suma << endl;\n    cout << \"Modulo: \" << modulo << endl;\n    return 0;\n}",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en C++",
+      "theoryMarkdown": "### 4. Funciones y Métodos en C++\nLas funciones encapsulan lógica reutilizable y pueden recibir parámetros y devolver valores mediante `return`.\n\n```cpp\n#include <iostream>\nusing namespace std;\n\nint sumar(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    cout << \"Suma: \" << sumar(10, 5) << endl;\n    return 0;\n}\n```",
+      "initialCode": "#include <iostream>\nusing namespace std;\n\nint sumar(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    cout << \"Suma: \" << sumar(10, 5) << endl;\n    return 0;\n}",
       "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
       "quiz": [
-        { "id": 1, "question": "¿Para qué sirve el operador módulo (%) en C++?", "options": ["Calcula el porcentaje", "Devuelve el residuo exacto de una división entera", "Eleva a una potencia", "Divide flotantes"], "correctIndex": 1, "explanation": "El operador % retorna el resto entero de la división entre dos números." }
+        { "id": 1, "question": "¿Qué palabra clave devuelve el resultado de una función en C++?", "options": ["return", "yield", "send", "out"], "correctIndex": 0, "explanation": "return entrega el valor calculated al llamante." }
       ]
     },
     {
-      "id": "cpp-intermedio",
-      "lang": "cpp",
-      "level": "intermedio",
-      "title": "02. Arreglos Unidimensionales, Bidimensionales y Funciones",
-      "theoryMarkdown": "### Fundamento Teórico (PDF 2)\nArreglos estáticos `int arr[5]` y matrices `int matriz[2][3]`.",
-      "initialCode": "#include <iostream>\nusing namespace std;\n\nint sumar(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    int numeros[5] = {10, 20, 30, 40, 50};\n    int sumaTotal = 0;\n    for (int i = 0; i < 5; i++) {\n        sumaTotal = sumar(sumaTotal, numeros[i]);\n    }\n    cout << \"Suma Total de Arreglo: \" << sumaTotal << endl;\n    return 0;\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Suma Total de Arreglo: 150" }],
+      "id": "python-c1",
+      "lang": "python",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en Python",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en Python\nEn Python, la impresión de mensajes en consola se realiza con la función integrada `print()`.\n\n```python\nprint(\"¡Hola Mundo desde Python!\")\nprint(\"Bienvenidos al curso de Programacion FP.\")\n```",
+      "initialCode": "print(\"¡Hola Mundo desde Python!\")\nprint(\"Bienvenidos al curso de Programacion FP.\")",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde Python!" }],
       "quiz": [
-        { "id": 1, "question": "¿Cuántos ciclos for se requieren para recorrer una matriz?", "options": ["Uno", "Dos ciclos anidados", "Tres", "Cero"], "correctIndex": 1, "explanation": "Se necesita un ciclo para filas y otro para columnas." }
+        { "id": 1, "question": "¿Qué función imprime texto por consola en Python?", "options": ["print()", "cout <<", "System.out.println()", "console.log()"], "correctIndex": 0, "explanation": "print() es la función nativa de salida en Python." }
       ]
     },
     {
-      "id": "cpp-avanzado",
-      "lang": "cpp",
-      "level": "avanzado",
-      "title": "03. Arreglos Dinámicos en Heap, Punteros 'new' / 'delete[]'",
-      "theoryMarkdown": "### Fundamento Teórico (PDF 2 Avanzado)\nReserva en Heap con `new int[n]` y liberación obligatoria con `delete[]`.",
-      "initialCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n = 3;\n    int* p = new int[n];\n    p[0] = 5; p[1] = 10; p[2] = 15;\n    int suma = 0;\n    for(int i = 0; i < n; i++) suma += p[i];\n    cout << \"Suma Heap: \" << suma << endl;\n    delete[] p;\n    return 0;\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Suma Heap: 30" }],
+      "id": "python-c2",
+      "lang": "python",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en Python",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en Python\nPython cuenta con tipado dinámico. Los tipos principales son `int`, `float`, `str` y `bool`.\n\n```python\nnombre = \"Carlos\"\nedad = 20\npromedio = 9.5\nprint(f\"{nombre} - Edad: {edad} - Nota: {promedio}\")\n```",
+      "initialCode": "nombre = \"Carlos\"\nedad = 20\npromedio = 9.5\nprint(f\"{nombre} - Edad: {edad} - Nota: {promedio}\")",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos - Edad: 20 - Nota: 9.5" }],
       "quiz": [
-        { "id": 1, "question": "¿Dónde se asigna la memoria cuando se utiliza el operador 'new' en C++?", "options": ["En el Stack", "En el Heap (memoria dinámica)", "En el registro de CPU", "En el archivo executable"], "correctIndex": 1, "explanation": "El operador new solicita espacio en el Heap." }
+        { "id": 1, "question": "¿Cómo se denominan las cadenas formateadas f\"...\" en Python?", "options": ["F-Strings", "Template Literals", "Format Specs", "Str Injects"], "correctIndex": 0, "explanation": "Las f-strings permiten interpolación directa de expresiones en cadenas." }
       ]
     },
     {
-      "id": "rust-basico",
-      "lang": "rust",
-      "level": "basico",
-      "title": "01. Sintaxis, Variables y Control de Flujo en Rust",
-      "theoryMarkdown": "### Adaptación PDF 1 a Rust\nfn main(), mutabilidad explícita y macros println!.",
-      "initialCode": "fn main() {\n    let bolsas = 4;\n    let precio = if bolsas >= 3 { 25 } else { 35 };\n    let total = bolsas * precio;\n    println!(\"El total a pagar es: {}\", total);\n}",
+      "id": "python-c3",
+      "lang": "python",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en Python",
+      "theoryMarkdown": "### 3. Condiciones y Bucles en Python\nPython evalúa condiciones con `if / elif / else` y bucles con `for` y `while` mediante sangría/indentación.\n\n```python\nbolsas = 4\nprecio = 25 if bolsas >= 3 else 35\ntotal = bolsas * precio\nprint(f\"El total a pagar es: {total}\")\n```",
+      "initialCode": "bolsas = 4\nprecio = 25 if bolsas >= 3 else 35\ntotal = bolsas * precio\nprint(f\"El total a pagar es: {total}\")",
       "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
-      "quiz": [{ "id": 1, "question": "¿Cómo se declara una variable mutable en Rust?", "options": ["let x = 5;", "let mut x = 5;", "var x = 5;", "const x = 5;"], "correctIndex": 1, "explanation": "let mut otorga mutabilidad a la variable." }]
+      "quiz": [
+        { "id": 1, "question": "¿Cómo se delimitan los bloques de código en Python?", "options": ["Mediante sangría o indentación", "Con llaves {}", "Con parentesis ()", "Con punto y coma ;"], "correctIndex": 0, "explanation": "La sangría (espacios/tabulaciones) define la estructura de bloques." }
+      ]
     },
     {
-      "id": "rust-intermedio",
+      "id": "python-c4",
+      "lang": "python",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en Python",
+      "theoryMarkdown": "### 4. Funciones y Métodos en Python\nLas funciones se definen con la palabra clave `def` y pueden retornar valores con `return`.\n\n```python\ndef sumar(a, b):\n    return a + b\n\nprint(f\"Suma: {sumar(10, 5)}\")\n```",
+      "initialCode": "def sumar(a, b):\n    return a + b\n\nprint(f\"Suma: {sumar(10, 5)}\")",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué palabra clave declara una función en Python?", "options": ["def", "function", "fn", "func"], "correctIndex": 0, "explanation": "def declara la definición de una función." }
+      ]
+    },
+    {
+      "id": "rust-c1",
       "lang": "rust",
-      "level": "intermedio",
-      "title": "02. Vectores Dinámicos, Búsqueda y Ordenamiento Burbuja en Rust",
-      "theoryMarkdown": "### Adaptación PDF 2 a Rust\nVectores dinámicos en Heap `Vec<T>`.",
-      "initialCode": "fn main() {\n    let mut numeros = vec![7, 2, 5, 1, 9];\n    let len = numeros.len();\n    for i in 0..len {\n        for j in 0..len - 1 - i {\n            if numeros[j] > numeros[j + 1] {\n                numeros.swap(j, j + 1);\n            }\n        }\n    }\n    println!(\"Vector Ordenado: {:?}\", numeros);\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Vector Ordenado: [1, 2, 5, 7, 9]" }],
-      "quiz": [{ "id": 1, "question": "¿Qué estructura de datos representa un arreglo dinámico en Heap en Rust?", "options": ["Array [T; N]", "Vec<T>", "Slice", "Tuple"], "correctIndex": 1, "explanation": "Vec<T> administra arreglos dinámicos en Heap." }]
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en Rust",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en Rust\nEn Rust, la ejecución inicia en `fn main()` y las salidas de texto se emiten mediante la macro `println!`.\n\n```rust\nfn main() {\n    println!(\"¡Hola Mundo desde Rust!\");\n    println!(\"Bienvenidos al curso de Programacion FP.\");\n}\n```",
+      "initialCode": "fn main() {\n    println!(\"¡Hola Mundo desde Rust!\");\n    println!(\"Bienvenidos al curso de Programacion FP.\");\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde Rust!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué indica el signo '!' en println! en Rust?", "options": ["Que es una macro del compilador", "Que es una función asíncrona", "Que borra la memoria", "Que es privada"], "correctIndex": 0, "explanation": "El signo '!' distingue la invocación de una macro." }
+      ]
     },
     {
-      "id": "rust-avanzado",
+      "id": "rust-c2",
       "lang": "rust",
-      "level": "avanzado",
-      "title": "03. Smart Pointers (Box<T>), Ownership y Prevención de Data Races",
-      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Rust\nSmart Pointers y RAII automático.",
-      "initialCode": "fn main() {\n    let val_heap: Box<i32> = Box::new(100);\n    println!(\"Valor Heap: {}\", *val_heap);\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Valor Heap: 100" }],
-      "quiz": [{ "id": 1, "question": "¿Qué hace Box<T> en Rust?", "options": ["Asigna un valor en el Heap", "Crea una UI", "Formatea JSON", "Detiene el hilo"], "correctIndex": 0, "explanation": "Box<T> asigna explícitamente el tipo en el Heap." }]
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en Rust",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en Rust\nLas variables en Rust son inmutables por defecto (`let x = 5;`). Para modificarlas se requiere `let mut`.\n\n```rust\nfn main() {\n    let nombre = \"Carlos\";\n    let edad: i32 = 20;\n    let promedio: f64 = 9.5;\n    println!(\"{} - Edad: {} - Nota: {}\", nombre, edad, promedio);\n}\n```",
+      "initialCode": "fn main() {\n    let nombre = \"Carlos\";\n    let edad: i32 = 20;\n    let promedio: f64 = 9.5;\n    println!(\"{} - Edad: {} - Nota: {}\", nombre, edad, promedio);\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos - Edad: 20 - Nota: 9.5" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cómo son las variables por defecto en Rust?", "options": ["Inmutables", "Mutables", "Globales", "Estáticas"], "correctIndex": 0, "explanation": "Rust promueve la seguridad haciendo las variables inmutables por defecto." }
+      ]
     },
     {
-      "id": "node-basico",
+      "id": "rust-c3",
+      "lang": "rust",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en Rust",
+      "theoryMarkdown": "### 3. Condiciones y Bucles en Rust\n`if` es una expresión en Rust que puede retornar un valor asignable.\n\n```rust\nfn main() {\n    let bolsas = 4;\n    let precio = if bolsas >= 3 { 25 } else { 35 };\n    println!(\"El total a pagar es: {}\", bolsas * precio);\n}\n```",
+      "initialCode": "fn main() {\n    let bolsas = 4;\n    let precio = if bolsas >= 3 { 25 } else { 35 };\n    println!(\"El total a pagar es: {}\", bolsas * precio);\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cómo funciona el condicional 'if' en Rust?", "options": ["Es una expresión que retorna valores", "Solo acepta 0 y 1", "Obliga a usar paréntesis", "No permite else"], "correctIndex": 0, "explanation": "if devuelve el valor resultante de su último statement." }
+      ]
+    },
+    {
+      "id": "rust-c4",
+      "lang": "rust",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en Rust",
+      "theoryMarkdown": "### 4. Funciones y Métodos en Rust\nLas funciones se definen con `fn` especificando los tipos de los parámetros y el tipo de retorno con `->`.\n\n```rust\nfn sumar(a: i32, b: i32) -> i32 {\n    a + b\n}\n\nfn main() {\n    println!(\"Suma: {}\", sumar(10, 5));\n}\n```",
+      "initialCode": "fn sumar(a: i32, b: i32) -> i32 {\n    a + b\n}\n\nfn main() {\n    println!(\"Suma: {}\", sumar(10, 5));\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cómo se especifica el tipo de retorno en una función en Rust?", "options": ["-> Tipo", ": Tipo", "=> Tipo", "as Tipo"], "correctIndex": 0, "explanation": "La flecha -> indica el tipo de retorno de la función." }
+      ]
+    },
+    {
+      "id": "node-c1",
       "lang": "node",
-      "level": "basico",
-      "title": "01. Variables, Estructuras de Control e I/O en Node.js",
-      "theoryMarkdown": "### Adaptación PDF 1 a Node.js\nTemplate literals `` `${expr}` `` y control de flujo.",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en Node.js",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en Node.js\nEn Node.js la salida de datos a consola se realiza con `console.log()`.\n\n```javascript\nconsole.log(\"¡Hola Mundo desde Node.js!\");\nconsole.log(\"Bienvenidos al curso de Programacion FP.\");\n```",
+      "initialCode": "console.log(\"¡Hola Mundo desde Node.js!\");\nconsole.log(\"Bienvenidos al curso de Programacion FP.\");",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde Node.js!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué método imprime mensajes en la consola de Node.js?", "options": ["console.log()", "print()", "cout <<", "System.out.println()"], "correctIndex": 0, "explanation": "console.log() escribe la salida en stdout." }
+      ]
+    },
+    {
+      "id": "node-c2",
+      "lang": "node",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en Node.js",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en Node.js\nUsa `const` para constantes e inmutabilidad de referencia, y `let` para variables reasignables.\n\n```javascript\nconst nombre = \"Carlos\";\nconst edad = 20;\nconst promedio = 9.5;\nconsole.log(`${nombre} - Edad: ${edad} - Nota: ${promedio}`);\n```",
+      "initialCode": "const nombre = \"Carlos\";\nconst edad = 20;\nconst promedio = 9.5;\nconsole.log(`${nombre} - Edad: ${edad} - Nota: ${promedio}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos - Edad: 20 - Nota: 9.5" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué diferencia existe entre 'const' y 'let'?", "options": ["const prohíbe reasignar la referencia; let la permite", "let es solo para números", "const es más lento", "Son idénticas"], "correctIndex": 0, "explanation": "const prohíbe la reasignación de variables." }
+      ]
+    },
+    {
+      "id": "node-c3",
+      "lang": "node",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en Node.js",
+      "theoryMarkdown": "### 3. Condiciones y Bucles en Node.js\nUtiliza condicionales `if / else`, ternario `? :` y bucles `for`, `while` o `.forEach()`.\n\n```javascript\nconst bolsas = 4;\nconst precio = bolsas >= 3 ? 25 : 35;\nconst total = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);\n```",
       "initialCode": "const bolsas = 4;\nconst precio = bolsas >= 3 ? 25 : 35;\nconst total = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);",
       "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
-      "quiz": [{ "id": 1, "question": "¿Qué diferencia existe entre 'const' y 'let'?", "options": ["const prohíbe reasignación; let la permite", "let solo es para números", "const es más lento", "Son idénticas"], "correctIndex": 0, "explanation": "const crea una vinculación inmutable." }]
-    },
-    {
-      "id": "node-intermedio",
-      "lang": "node",
-      "level": "intermedio",
-      "title": "02. Arrays, Ordenamiento Burbuja y Funciones",
-      "theoryMarkdown": "### Adaptación PDF 2 a Node.js\nArrays dinámicos y algoritmo Bubble Sort.",
-      "initialCode": "const numeros = [7, 2, 5, 1, 9];\nfor (let i = 0; i < numeros.length - 1; i++) {\n    for (let j = 0; j < numeros.length - 1 - i; j++) {\n        if (numeros[j] > numeros[j + 1]) {\n            let temp = numeros[j];\n            numeros[j] = numeros[j + 1];\n            numeros[j + 1] = temp;\n        }\n    }\n}\nconsole.log(\"Array Ordenado:\", numeros);",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Array Ordenado: [ 1, 2, 5, 7, 9 ]" }],
-      "quiz": [{ "id": 1, "question": "¿Qué método nativo de Array en JS permite ordenar elementos?", "options": ["array.sort()", "array.order()", "array.arrange()", "array.group()"], "correctIndex": 0, "explanation": ".sort() ordena arreglos in-place." }]
-    },
-    {
-      "id": "node-avanzado",
-      "lang": "node",
-      "level": "avanzado",
-      "title": "03. Asincronía, Event Loop, Promises y Async/Await",
-      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Node.js\nPromises y funciones async/await.",
-      "initialCode": "const delay = ms => new Promise(res => setTimeout(res, ms));\nasync function ejecutar() {\n    await delay(50);\n    console.log(\"Async Process Complete\");\n}\nejecutar();",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Async Process Complete" }],
-      "quiz": [{ "id": 1, "question": "¿Qué objeto encapsula el resultado de una tarea asíncrona?", "options": ["Promise", "Buffer", "Process", "Stream"], "correctIndex": 0, "explanation": "Promise representa la resolución o fallo de una tarea asíncrona." }]
-    },
-    {
-      "id": "java-basico",
-      "lang": "java",
-      "level": "basico",
-      "title": "01. Estructura Básica en Java, Variables y Operadores",
-      "theoryMarkdown": "### Adaptación PDF 1 a Java\nClases public class Main y método main.",
-      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        int bolsas = 4;\n        int precio = (bolsas >= 3) ? 25 : 35;\n        int total = bolsas * precio;\n        System.out.println(\"El total a pagar es: \" + total);\n    }\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
-      "quiz": [{ "id": 1, "question": "¿Qué método es el punto de entrada en Java?", "options": ["public static void main(String[] args)", "public void start()", "int main()", "static void execute()"], "correctIndex": 0, "explanation": "La JVM invoca main como punto de inicio." }]
-    },
-    {
-      "id": "java-intermedio",
-      "lang": "java",
-      "level": "intermedio",
-      "title": "02. Arreglos Unidimensionales y Ordenamiento Burbuja en Java",
-      "theoryMarkdown": "### Adaptación PDF 2 a Java\nArreglos primitivos `int[]` y Bubble Sort.",
-      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        int[] numeros = {7, 2, 5, 1, 9};\n        for (int i = 0; i < numeros.length - 1; i++) {\n            for (int j = 0; j < numeros.length - 1 - i; j++) {\n                if (numeros[j] > numeros[j + 1]) {\n                    int temp = numeros[j];\n                    numeros[j] = numeros[j + 1];\n                    numeros[j + 1] = temp;\n                }\n            }\n        }\n        System.out.println(\"Arreglo Ordenado: \" + java.util.Arrays.toString(numeros));\n    }\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Arreglo Ordenado: [1, 2, 5, 7, 9]" }],
-      "quiz": [{ "id": 1, "question": "¿Qué método convierte un arreglo int[] a String formateado?", "options": ["Arrays.toString(arr)", "arr.toString()", "String.valueOf(arr)", "Arrays.print(arr)"], "correctIndex": 0, "explanation": "Arrays.toString(arr) genera [1, 2, 3]." }]
-    },
-    {
-      "id": "java-avanzado",
-      "lang": "java",
-      "level": "avanzado",
-      "title": "03. Generics, Stream API y Manejo de Excepciones",
-      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Java\nStream API y ordenamiento declarativo.",
-      "initialCode": "import java.util.Arrays;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> datos = Arrays.asList(7, 2, 5, 1, 9);\n        datos.stream().sorted().forEach(n -> System.out.print(n + \" \"));\n    }\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "1 2 5 7 9" }],
-      "quiz": [{ "id": 1, "question": "¿Qué operador introduce expresiones Lambda en Java 8+?", "options": ["->", "=>", "::", ":="], "correctIndex": 0, "explanation": "El operador flecha -> separa los parámetros del cuerpo." }]
-    },
-    {
-      "id": "sql-basico",
-      "lang": "sql",
-      "level": "basico",
-      "title": "01. Tablas, Inserciones y Filtrado WHERE",
-      "theoryMarkdown": "### Adaptación PDF 1 a SQL\nDDL (`CREATE TABLE`) y DML (`INSERT INTO`, `SELECT`).",
-      "initialCode": "CREATE TABLE compras (id INT, bolsas INT, total INT);\nINSERT INTO compras VALUES (1, 4, 100), (2, 2, 70);\nSELECT * FROM compras WHERE bolsas >= 3;",
-      "testCases": [{ "input": "N/A", "expectedOutput": "100" }],
-      "quiz": [{ "id": 1, "question": "¿Qué instrucción DDL crea una nueva tabla?", "options": ["CREATE TABLE", "MAKE TABLE", "ADD TABLE", "NEW TABLE"], "correctIndex": 0, "explanation": "CREATE TABLE define el esquema." }]
-    },
-    {
-      "id": "sql-intermedio",
-      "lang": "sql",
-      "level": "intermedio",
-      "title": "02. Agregaciones (COUNT, AVG, SUM) y Ordenamiento ORDER BY",
-      "theoryMarkdown": "### Adaptación PDF 2 a SQL\nFunciones agregadas y cláusula `ORDER BY`.",
-      "initialCode": "CREATE TABLE productos (id INT, nombre TEXT, precio INT);\nINSERT INTO productos VALUES (1, 'Bolsas Pequenas', 35), (2, 'Bolsas Grandes', 25);\nSELECT * FROM productos ORDER BY precio ASC;",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Bolsas Grandes" }],
-      "quiz": [{ "id": 1, "question": "¿Qué cláusula ordena el resultado de una consulta SQL?", "options": ["ORDER BY", "GROUP BY", "SORT BY", "ALIGN BY"], "correctIndex": 0, "explanation": "ORDER BY especifica el orden." }]
-    },
-    {
-      "id": "sql-avanzado",
-      "lang": "sql",
-      "level": "avanzado",
-      "title": "03. Relaciones y Joins entre Tablas (INNER JOIN)",
-      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a SQL\nCombinación de relaciones con `INNER JOIN`.",
-      "initialCode": "CREATE TABLE clientes (id INT, nombre TEXT);\nCREATE TABLE pedidos (id INT, cliente_id INT, total INT);\nINSERT INTO clientes VALUES (1, 'Alex'), (2, 'Maria');\nINSERT INTO pedidos VALUES (101, 1, 100);\nSELECT clientes.nombre, pedidos.total FROM clientes INNER JOIN pedidos ON clientes.id = pedidos.cliente_id;",
-      "testCases": [{ "input": "N/A", "expectedOutput": "100" }],
-      "quiz": [{ "id": 1, "question": "¿Qué filas retorna un INNER JOIN?", "options": ["Solo las filas que coinciden en ambas tablas", "Todas las filas de ambas", "Solo la tabla izquierda", "Ninguna"], "correctIndex": 0, "explanation": "INNER JOIN combina filas con coincidencias en la condición ON." }]
-    },
-    {
-      "id": "typescript-basico",
-      "lang": "typescript",
-      "level": "basico",
-      "title": "01. Tipado Explicito, Variables y Operadores en TypeScript",
-      "theoryMarkdown": "### Adaptación PDF 1 a TypeScript\nTipado estático `: number` y comillas invertidas `` `${expr}` ``.",
-      "initialCode": "let bolsas: number = 4;\nlet precio: number = bolsas >= 3 ? 25 : 35;\nlet total: number = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);",
-      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
-      "quiz": [{ "id": 1, "question": "¿Cómo se especifica el tipo de una variable numérica?", "options": ["let x: number = 5;", "let number x = 5;", "int x = 5;", "var x: int = 5;"], "correctIndex": 0, "explanation": "Sintaxis variable: tipo." }]
-    },
-    {
-      "id": "typescript-intermedio",
-      "lang": "typescript",
-      "level": "intermedio",
-      "title": "02. Interfaces, Arrays Tipados y Ordenamiento en TypeScript",
-      "theoryMarkdown": "### Adaptación PDF 2 a TypeScript\nInterfaces estructurales para objetos y tipos.",
-      "initialCode": "interface Producto {\n    nombre: string;\n    precio: number;\n}\nconst item: Producto = { nombre: \"Bolsas\", precio: 25 };\nconsole.log(`${item.nombre}: $${item.precio}`);",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Bolsas: $25" }],
-      "quiz": [{ "id": 1, "question": "¿Para qué sirve 'interface' en TypeScript?", "options": ["Para definir la forma y tipo de propiedades de un objeto", "Para crear HTML", "Para compilar C++", "Para borrar arreglos"], "correctIndex": 0, "explanation": "interface define contratos de objetos." }]
-    },
-    {
-      "id": "typescript-avanzado",
-      "lang": "typescript",
-      "level": "avanzado",
-      "title": "03. Generics <T>, Mapped Types y Type Guards",
-      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a TypeScript\nGenerics `<T>` reutilizables con seguridad de tipo.",
-      "initialCode": "function envolver<T>(val: T): { data: T } {\n    return { data: val };\n}\nconst res = envolver<string>(\"TS Avanzado OK\");\nconsole.log(res.data);",
-      "testCases": [{ "input": "N/A", "expectedOutput": "TS Avanzado OK" }],
-      "quiz": [{ "id": 1, "question": "¿Cuál es la utilidad de Generics <T>?", "options": ["Permiten abstraer tipos concretos manteniendo la seguridad estática", "Aumentan tamaño del JS", "Solo sirven para strings", "Conectan BD"], "correctIndex": 0, "explanation": "Los genéricos permiten reutilización de componentes tipados." }]
-    },
-    {
-      "id": "solidity-basico",
-      "lang": "solidity",
-      "level": "basico",
-      "title": "01. Contratos, Pragma e I/O en Solidity EVM",
-      "theoryMarkdown": "### Adaptación PDF 1 a Solidity\nContratos en EVM con uint256 y variables de estado public.",
-      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract CalculoCompra {\n    string public estado = \"El total a pagar es: 100\";\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
-      "quiz": [{ "id": 1, "question": "¿Dónde se ejecutan los Smart Contracts?", "options": ["En la EVM", "En el navegador", "En el disco local", "En la BD"], "correctIndex": 0, "explanation": "Los contratos se ejecutan dentro de la Ethereum Virtual Machine." }]
-    },
-    {
-      "id": "solidity-intermedio",
-      "lang": "solidity",
-      "level": "intermedio",
-      "title": "02. Funciones Pure, View y Arrays de Estado",
-      "theoryMarkdown": "### Adaptación PDF 2 a Solidity\nFunciones `view` y arreglos dinámicos en storage.",
-      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract ArregloEVM {\n    uint256[] public numeros = [1, 2, 5, 7, 9];\n    function obtenerPrimero() public view returns (uint256) {\n        return numeros[0];\n    }\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "1" }],
       "quiz": [
-        { "id": 1, "question": "¿Qué diferencia existe entre 'view' y 'pure'?", "options": ["'view' lee el estado; 'pure' ni lee ni modifica", "'pure' modifica la cadena", "'view' cobra gas", "Son idénticas"], "correctIndex": 0, "explanation": "view lee storage; pure solo opera con parámetros recibidos." }
+        { "id": 1, "question": "¿Qué comillas permiten interpolación directa de expresiones en Node.js?", "options": ["Comillas invertidas ``", "Comillas simples ''", "Comillas dobles \"\"", "Ninguna"], "correctIndex": 0, "explanation": "Las comillas invertidas permiten la interpolación ${expresion}." }
       ]
     },
     {
-      "id": "solidity-avanzado",
-      "lang": "solidity",
-      "level": "avanzado",
-      "title": "03. Mappings, Custom Errors y Optimización de Gas",
-      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Solidity\nMappings asociativos e inmutabilidad en EVM.",
-      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract StorageOptimized {\n    mapping(address => string) public usuarios;\n    constructor() {\n        usuarios[msg.sender] = \"Solidity Avanzado OK\";\n    }\n}",
-      "testCases": [{ "input": "N/A", "expectedOutput": "Solidity Avanzado OK" }],
+      "id": "node-c4",
+      "lang": "node",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en Node.js",
+      "theoryMarkdown": "### 4. Funciones y Métodos en Node.js\nLas funciones pueden declararse con la palabra clave `function` o con funciones flecha (Arrow Functions).\n\n```javascript\nconst sumar = (a, b) => a + b;\nconsole.log(`Suma: ${sumar(10, 5)}`);\n```",
+      "initialCode": "const sumar = (a, b) => a + b;\nconsole.log(`Suma: ${sumar(10, 5)}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
       "quiz": [
-        { "id": 1, "question": "¿Qué representa la variable global msg.sender?", "options": ["La dirección del emisor de la transacción", "El saldo del contrato", "El número de bloque", "La fecha"], "correctIndex": 0, "explanation": "msg.sender contiene la dirección de 20 bytes del iniciador del call." }
+        { "id": 1, "question": "¿Cómo se declara una Arrow Function en JavaScript/Node.js?", "options": ["(a, b) => a + b", "function(a,b) => a+b", "def (a,b) => a+b", "lambda a,b: a+b"], "correctIndex": 0, "explanation": "Sintaxis compacta de funciones con el operador flecha =>." }
+      ]
+    },
+    {
+      "id": "java-c1",
+      "lang": "java",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en Java",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en Java\nEn Java todo código reside en una clase (`public class Main`) e inicia en `main`.\n\n```java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"¡Hola Mundo desde Java!\");\n        System.out.println(\"Bienvenidos al curso de Programacion FP.\");\n    }\n}\n```",
+      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"¡Hola Mundo desde Java!\");\n        System.out.println(\"Bienvenidos al curso de Programacion FP.\");\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde Java!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué método imprime una línea de texto en consola en Java?", "options": ["System.out.println()", "console.log()", "cout <<", "print()"], "correctIndex": 0, "explanation": "System.out.println() escribe en la salida estándar." }
+      ]
+    },
+    {
+      "id": "java-c2",
+      "lang": "java",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en Java",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en Java\nJava es fuertemente tipado. Declaración con `String`, `int`, `double`, `boolean`.\n\n```java\npublic class Main {\n    public static void main(String[] args) {\n        String nombre = \"Carlos\";\n        int edad = 20;\n        double promedio = 9.5;\n        System.out.println(nombre + \" - Edad: \" + edad + \" - Nota: \" + promedio);\n    }\n}\n```",
+      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        String nombre = \"Carlos\";\n        int edad = 20;\n        double promedio = 9.5;\n        System.out.println(nombre + \" - Edad: \" + edad + \" - Nota: \" + promedio);\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos - Edad: 20 - Nota: 9.5" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué tipo de dato de Java almacena cadenas de texto?", "options": ["String", "char", "text", "str"], "correctIndex": 0, "explanation": "String es la clase que representa cadenas de caracteres en Java." }
+      ]
+    },
+    {
+      "id": "java-c3",
+      "lang": "java",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en Java",
+      "theoryMarkdown": "### 3. Condiciones y Bucles en Java\nEvaluación de condiciones con `if / else` y operador ternario `? :`.\n\n```java\npublic class Main {\n    public static void main(String[] args) {\n        int bolsas = 4;\n        int precio = (bolsas >= 3) ? 25 : 35;\n        int total = bolsas * precio;\n        System.out.println(\"El total a pagar es: \" + total);\n    }\n}\n```",
+      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        int bolsas = 4;\n        int precio = (bolsas >= 3) ? 25 : 35;\n        int total = bolsas * precio;\n        System.out.println(\"El total a pagar es: \" + total);\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué devuelve (4 >= 3) ? 25 : 35 en Java?", "options": ["25", "35", "100", "0"], "correctIndex": 0, "explanation": "La condición es verdadera por lo que retorna 25." }
+      ]
+    },
+    {
+      "id": "java-c4",
+      "lang": "java",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en Java",
+      "theoryMarkdown": "### 4. Funciones y Métodos en Java\nLos métodos se definen dentro de la clase y pueden ser estáticos (`static`) para invocación directa.\n\n```java\npublic class Main {\n    public static int sumar(int a, int b) {\n        return a + b;\n    }\n    public static void main(String[] args) {\n        System.out.println(\"Suma: \" + sumar(10, 5));\n    }\n}\n```",
+      "initialCode": "public class Main {\n    public static int sumar(int a, int b) {\n        return a + b;\n    }\n    public static void main(String[] args) {\n        System.out.println(\"Suma: \" + sumar(10, 5));\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué indica la palabra 'static' en un método de Java?", "options": ["Que pertenece a la clase y no requiere instanciar un objeto", "Que es privado", "Que no se puede ejecutar", "Que es lento"], "correctIndex": 0, "explanation": "static asocia el método a la clase." }
+      ]
+    },
+    {
+      "id": "sql-c1",
+      "lang": "sql",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en SQL",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en SQL\nSQL utiliza la instrucción `SELECT` para proyectar mensajes o cadenas por pantalla.\n\n```sql\nSELECT '¡Hola Mundo desde SQL!' AS mensaje;\n```",
+      "initialCode": "SELECT '¡Hola Mundo desde SQL!' AS mensaje;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde SQL!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué comando proyecta datos o mensajes en SQL?", "options": ["SELECT", "PRINT", "SHOW", "DISPLAY"], "correctIndex": 0, "explanation": "SELECT proyecta el conjunto de resultados de una consulta." }
+      ]
+    },
+    {
+      "id": "sql-c2",
+      "lang": "sql",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en SQL",
+      "theoryMarkdown": "### 2. Tablas y Tipos de Datos en SQL\nDefinición de tablas con DDL (`CREATE TABLE`) y tipos relacionales (`INT`, `TEXT`, `REAL`).\n\n```sql\nCREATE TABLE estudiantes (id INT, nombre TEXT, nota REAL);\nINSERT INTO estudiantes VALUES (1, 'Carlos', 9.5);\nSELECT * FROM estudiantes;\n```",
+      "initialCode": "CREATE TABLE estudiantes (id INT, nombre TEXT, nota REAL);\nINSERT INTO estudiantes VALUES (1, 'Carlos', 9.5);\nSELECT * FROM estudiantes;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué comando DDL crea una tabla en SQL?", "options": ["CREATE TABLE", "MAKE TABLE", "ADD TABLE", "NEW TABLE"], "correctIndex": 0, "explanation": "CREATE TABLE establece el esquema." }
+      ]
+    },
+    {
+      "id": "sql-c3",
+      "lang": "sql",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en SQL",
+      "theoryMarkdown": "### 3. Condiciones y Filtrado en SQL\nFiltrado de datos con predicados `WHERE` y evaluación por filas con `CASE WHEN`.\n\n```sql\nCREATE TABLE compras (id INT, bolsas INT, total INT);\nINSERT INTO compras VALUES (1, 4, 100), (2, 2, 70);\nSELECT * FROM compras WHERE bolsas >= 3;\n```",
+      "initialCode": "CREATE TABLE compras (id INT, bolsas INT, total INT);\nINSERT INTO compras VALUES (1, 4, 100), (2, 2, 70);\nSELECT * FROM compras WHERE bolsas >= 3;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué cláusula filtra filas en una consulta SQL?", "options": ["WHERE", "FILTER", "HAVING", "CHECK"], "correctIndex": 0, "explanation": "WHERE filtra registros según una condición booleana." }
+      ]
+    },
+    {
+      "id": "sql-c4",
+      "lang": "sql",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en SQL",
+      "theoryMarkdown": "### 4. Funciones de Agregación y Consultas Avanzadas\nAgregación de datos mediante `COUNT()`, `SUM()`, `AVG()` y combinaciones con `INNER JOIN`.\n\n```sql\nCREATE TABLE alumnos (id INT, nombre TEXT);\nCREATE TABLE notas (alumno_id INT, calificacion INT);\nINSERT INTO alumnos VALUES (1, 'Carlos');\nINSERT INTO notas VALUES (1, 100);\n\nSELECT alumnos.nombre, notas.calificacion \nFROM alumnos \nINNER JOIN notas ON alumnos.id = notas.alumno_id;\n```",
+      "initialCode": "CREATE TABLE alumnos (id INT, nombre TEXT);\nCREATE TABLE notas (alumno_id INT, calificacion INT);\nINSERT INTO alumnos VALUES (1, 'Carlos');\nINSERT INTO notas VALUES (1, 100);\nSELECT alumnos.nombre, notas.calificacion FROM alumnos INNER JOIN notas ON alumnos.id = notas.alumno_id;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué función calcula la suma total de una columna numérica?", "options": ["SUM()", "TOTAL()", "COUNT()", "ADD()"], "correctIndex": 0, "explanation": "SUM() calcula la suma de todos los valores de la columna." }
+      ]
+    },
+    {
+      "id": "typescript-c1",
+      "lang": "typescript",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en TypeScript",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en TypeScript\nTypeScript transpila a JavaScript y emite salida por consola con `console.log()`.\n\n```typescript\nlet mensaje: string = \"¡Hola Mundo desde TypeScript!\";\nconsole.log(mensaje);\n```",
+      "initialCode": "let mensaje: string = \"¡Hola Mundo desde TypeScript!\";\nconsole.log(mensaje);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde TypeScript!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cómo se especifica el tipo explícito de una variable en TypeScript?", "options": ["let v: string = 'texto'", "let string v = 'texto'", "string v = 'texto'", "var v = 'texto'"], "correctIndex": 0, "explanation": "Sintaxis variable: tipo = valor." }
+      ]
+    },
+    {
+      "id": "typescript-c2",
+      "lang": "typescript",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en TypeScript",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en TypeScript\nVerificación estática con tipos primitivos (`number`, `string`, `boolean`).\n\n```typescript\nconst nombre: string = \"Carlos\";\nconst edad: number = 20;\nconst promedio: number = 9.5;\nconsole.log(`${nombre} - Edad: ${edad} - Nota: ${promedio}`);\n```",
+      "initialCode": "const nombre: string = \"Carlos\";\nconst edad: number = 20;\nconst promedio: number = 9.5;\nconsole.log(`${nombre} - Edad: ${edad} - Nota: ${promedio}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos - Edad: 20 - Nota: 9.5" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué tipo se usa para números enteros y decimales en TypeScript?", "options": ["number", "int", "float", "double"], "correctIndex": 0, "explanation": "number es el único tipo numérico estático de TypeScript." }
+      ]
+    },
+    {
+      "id": "typescript-c3",
+      "lang": "typescript",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en TypeScript",
+      "theoryMarkdown": "### 3. Condiciones y Bucles en TypeScript\nEvaluación de condicionales con verificaciones de tipo estáticas.\n\n```typescript\nconst bolsas: number = 4;\nconst precio: number = bolsas >= 3 ? 25 : 35;\nconst total: number = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);\n```",
+      "initialCode": "const bolsas: number = 4;\nconst precio: number = bolsas >= 3 ? 25 : 35;\nconst total: number = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué ventaja aporta TypeScript en las condiciones?", "options": ["Valida tipos en compilación para prevenir errores de tipo", "Ejecuta más rápido", "No requiere variables", "Borra el navegador"], "correctIndex": 0, "explanation": "Atrapa incoherencias de tipos en tiempo de desarrollo." }
+      ]
+    },
+    {
+      "id": "typescript-c4",
+      "lang": "typescript",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en TypeScript",
+      "theoryMarkdown": "### 4. Funciones y Métodos en TypeScript\nFirmas de funciones fuertemente tipadas con parámetros y tipo de retorno explícito.\n\n```typescript\nfunction sumar(a: number, b: number): number {\n    return a + b;\n}\nconsole.log(`Suma: ${sumar(10, 5)}`);\n```",
+      "initialCode": "function sumar(a: number, b: number): number {\n    return a + b;\n}\nconsole.log(`Suma: ${sumar(10, 5)}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cómo se indica el tipo de retorno de una función en TypeScript?", "options": ["function f(): number", "function f() -> number", "function f() as number", "function number f()"], "correctIndex": 0, "explanation": "Se coloca dos puntos y el tipo tras los paréntesis de parámetros." }
+      ]
+    },
+    {
+      "id": "solidity-c1",
+      "lang": "solidity",
+      "level": "c1",
+      "title": "01. Hola Mundo & Mensaje en Solidity",
+      "theoryMarkdown": "### 1. Hola Mundo & Mensaje en Solidity EVM\nSmart Contracts en la EVM con variables de estado públicas.\n\n```solidity\n// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract HolaMundo {\n    string public mensaje = \"¡Hola Mundo desde Solidity!\";\n}\n```",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract HolaMundo {\n    string public mensaje = \"¡Hola Mundo desde Solidity!\";\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "¡Hola Mundo desde Solidity!" }],
+      "quiz": [
+        { "id": 1, "question": "¿Dónde residen y se ejecutan los contratos de Solidity?", "options": ["En la EVM (Ethereum Virtual Machine)", "En un servidor Node.js", "En el navegador directamente", "En una BD SQL"], "correctIndex": 0, "explanation": "Solidity compila a bytecode que se ejecuta en la EVM." }
+      ]
+    },
+    {
+      "id": "solidity-c2",
+      "lang": "solidity",
+      "level": "c2",
+      "title": "02. Variables y Tipo de Datos en Solidity",
+      "theoryMarkdown": "### 2. Variables y Tipo de Datos en Solidity\nVariables de estado en `storage` primitivas como `uint256`, `address`, `string`, `bool`.\n\n```solidity\n// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Datos {\n    string public nombre = \"Carlos\";\n    uint256 public edad = 20;\n}\n```",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Datos {\n    string public nombre = \"Carlos\";\n    uint256 public edad = 20;\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Carlos" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué tipo entero sin signo de 256 bits se utiliza nativamente en la EVM?", "options": ["uint256", "int", "number", "long"], "correctIndex": 0, "explanation": "uint256 es el entero nativo de 256 bits en EVM." }
+      ]
+    },
+    {
+      "id": "solidity-c3",
+      "lang": "solidity",
+      "level": "c3",
+      "title": "03. Condiciones y Bucles en Solidity",
+      "theoryMarkdown": "### 3. Condiciones y Control de Flujo en Solidity\nUso de `if / else`, ternario `? :` y la instrucción de validación de condiciones `require()`.\n\n```solidity\n// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Compra {\n    string public estado = \"El total a pagar es: 100\";\n}\n```",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Compra {\n    string public estado = \"El total a pagar es: 100\";\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué función de validación revierte la transacción si una condición no se cumple?", "options": ["require()", "assert()", "revert()", "check()"], "correctIndex": 0, "explanation": "require() evalúa la condición y revierte los cambios si es falsa." }
+      ]
+    },
+    {
+      "id": "solidity-c4",
+      "lang": "solidity",
+      "level": "c4",
+      "title": "04. Funciones, Consultas y Métodos en Solidity",
+      "theoryMarkdown": "### 4. Funciones y Modificadores de Visibilidad en Solidity\nFunciones `pure` y `view` con especificadores de visibilidad (`public`, `external`, `internal`, `private`).\n\n```solidity\n// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Calculadora {\n    function sumar(uint256 a, uint256 b) public pure returns (uint256) {\n        return a + b;\n    }\n}\n```",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Calculadora {\n    function sumar(uint256 a, uint256 b) public pure returns (uint256) {\n        return a + b;\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "15" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué modificador indica que una función no lee ni modifica el estado de la cadena?", "options": ["pure", "view", "payable", "public"], "correctIndex": 0, "explanation": "pure realiza cálculos aislados únicamente con sus argumentos." }
       ]
     }
   ]
@@ -3365,7 +3489,7 @@ const EMBEDDED_CURRICULUM_DATA = {
    ========================================================================== */
 let coursesDataGlobal = null;
 let currentCourseLang = 'cpp';
-let currentCourseLevel = 'basico';
+let currentCourseLevel = 'c1';
 
 const LANGUAGE_PROGRESSION_SEQUENCE = [
     { id: 'cpp', name: 'C++', icon: '⚙️' },
@@ -3429,17 +3553,17 @@ function initDocenteAdminToggle() {
     });
 }
 
+const COURSE_LEVEL_KEYS = ['c1', 'c2', 'c3', 'c4'];
+
 function isLanguageCompleted(langId) {
-    const levels = ['basico', 'intermedio', 'avanzado'];
-    return levels.every(level => {
+    return COURSE_LEVEL_KEYS.every(level => {
         return localStorage.getItem(`devhub_course_completed_${langId}_${level}`) === 'true';
     });
 }
 
 function getLanguageCompletedCount(langId) {
-    const levels = ['basico', 'intermedio', 'avanzado'];
     let count = 0;
-    levels.forEach(l => {
+    COURSE_LEVEL_KEYS.forEach(l => {
         if (localStorage.getItem(`devhub_course_completed_${langId}_${l}`) === 'true') count++;
     });
     return count;
@@ -3458,9 +3582,9 @@ function updateLanguageSelectorUI() {
         const count = getLanguageCompletedCount(langId);
 
         if (completed) {
-            opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (✅ Completado 3/3)`;
+            opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (✅ Completado 4/4)`;
         } else if (unlocked) {
-            opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (🔓 Desbloqueado ${count}/3)`;
+            opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (🔓 Desbloqueado ${count}/4)`;
         } else {
             const prevName = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1] ? LANGUAGE_PROGRESSION_SEQUENCE[idx - 1].name : '';
             opt.textContent = `${idx + 1}. 🔒 ${seqItem ? seqItem.name : langId} (Bloqueado - Completa ${prevName})`;
@@ -3472,10 +3596,10 @@ function updateLanguageSelectorUI() {
         const currentSeq = LANGUAGE_PROGRESSION_SEQUENCE.find(l => l.id === currentCourseLang);
         const count = getLanguageCompletedCount(currentCourseLang);
         if (isLanguageCompleted(currentCourseLang)) {
-            unlockBadge.textContent = `✅ ${currentSeq ? currentSeq.name : currentCourseLang} Completado (3/3 Cursos)`;
+            unlockBadge.textContent = `✅ ${currentSeq ? currentSeq.name : currentCourseLang} Completado (4/4 Cursos)`;
             unlockBadge.className = 'badge badge-success';
         } else if (isLanguageUnlocked(currentCourseLang)) {
-            unlockBadge.textContent = `🔓 ${currentSeq ? currentSeq.name : currentCourseLang} Desbloqueado (${count}/3 Cursos)`;
+            unlockBadge.textContent = `🔓 ${currentSeq ? currentSeq.name : currentCourseLang} Desbloqueado (${count}/4 Cursos)`;
             unlockBadge.className = 'badge badge-accent';
         } else {
             unlockBadge.textContent = `🔒 ${currentSeq ? currentSeq.name : currentCourseLang} Bloqueado`;
