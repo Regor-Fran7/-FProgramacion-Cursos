@@ -3505,7 +3505,7 @@ let isDocenteAdminMode = localStorage.getItem('devhub_docente_admin_mode') === '
 
 function isLanguageUnlocked(langId) {
     if (isAdminUser(userProfile)) {
-        if (isDocenteAdminMode || userProfile.masterUnlocked) return true; // 👑 Modo Docente/Administrador
+        return true; // 👑 El perfil Administrador Docente tiene los 8 lenguajes desbloqueados automáticamente
     }
 
     const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
