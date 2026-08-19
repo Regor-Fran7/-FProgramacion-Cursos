@@ -2153,11 +2153,11 @@ function initUserModalEvents() {
 /* ==========================================================================
    SEQUENTIAL LANGUAGE PROGRESSION ENGINE
    ========================================================================== */
-const LANGUAGES_ORDER = ['python', 'cpp', 'rust', 'node', 'java', 'sql', 'typescript', 'solidity'];
+const LANGUAGES_ORDER = ['cpp', 'python', 'rust', 'node', 'java', 'sql', 'typescript', 'solidity'];
 
 const LANGUAGES_INFO_MAP = {
-    python: { name: 'Python', icon: '🐍', tag: 'IA & Data Science' },
     cpp: { name: 'C++', icon: '⚙️', tag: 'Rendimiento Extremo' },
+    python: { name: 'Python', icon: '🐍', tag: 'IA & Data Science' },
     rust: { name: 'Rust', icon: '🦀', tag: 'Seguridad en Memoria' },
     node: { name: 'Node.js', icon: '🟢', tag: 'Servidor Asíncrono' },
     java: { name: 'Java', icon: '☕', tag: 'Enterprise & POO' },
@@ -2167,62 +2167,41 @@ const LANGUAGES_INFO_MAP = {
 };
 
 function getActiveLanguage() {
-    if (!userProfile.activeLanguage) {
-        userProfile.activeLanguage = 'python';
+    if (!userProfile || !userProfile.activeLanguage) {
+        if (userProfile) userProfile.activeLanguage = 'cpp';
+        return 'cpp';
     }
     return userProfile.activeLanguage;
 }
 
 function getLanguageProgress(langId) {
+    if (!userProfile) return [];
     if (!userProfile.langProgress) {
         userProfile.langProgress = {};
     }
     if (!userProfile.langProgress[langId]) {
-        if (langId === 'python' && userProfile.completedLessons && userProfile.completedLessons.length > 0) {
-            userProfile.langProgress.python = [...userProfile.completedLessons];
-        } else {
-            userProfile.langProgress[langId] = [];
-        }
+        userProfile.langProgress[langId] = [];
     }
     return userProfile.langProgress[langId];
 }
 
 function getLanguageUnlockStatus(langId) {
+    const unlocked = isLanguageUnlocked(langId);
+    const isCompleted = isLanguageCompleted(langId);
+    const completedCount = getLanguageCompletedCount(langId);
+    const totalCourses = 4;
+
     const langIndex = LANGUAGES_ORDER.indexOf(langId);
-    const totalCourses = (typeof getSequentialCourses === 'function') ? getSequentialCourses().length : 24;
-    if (langIndex === -1) return { unlocked: true, isCompleted: false, completedCount: 0, totalCount: totalCourses };
+    const prevLangId = langIndex > 0 ? LANGUAGES_ORDER[langIndex - 1] : null;
+    const prevLangName = prevLangId && LANGUAGES_INFO_MAP[prevLangId] ? LANGUAGES_INFO_MAP[prevLangId].name : 'el lenguaje anterior';
 
-    const currentProgress = getLanguageProgress(langId);
-    const completedCount = currentProgress.length;
-    const isCompleted = completedCount >= totalCourses;
-
-    // Master Admin / Teacher Override OR Master Unlocked
-    if (userProfile && (userProfile.masterUnlocked || userProfile.isAdmin)) {
-        return { unlocked: true, isCompleted, completedCount, totalCount: totalCourses };
-    }
-
-    // Python is unlocked by default
-    if (langIndex === 0) {
-        return { unlocked: true, isCompleted, completedCount, totalCount: totalCourses };
-    }
-
-    // Language N unlocked if Language N-1 completed all courses
-    const prevLangId = LANGUAGES_ORDER[langIndex - 1];
-    const prevProgress = getLanguageProgress(prevLangId);
-    const prevCompleted = prevProgress.length >= totalCourses;
-
-    if (prevCompleted) {
-        return { unlocked: true, isCompleted, completedCount, totalCount: totalCourses };
-    } else {
-        const prevLangName = LANGUAGES_INFO_MAP[prevLangId] ? LANGUAGES_INFO_MAP[prevLangId].name : prevLangId;
-        return {
-            unlocked: false,
-            isCompleted: false,
-            completedCount,
-            totalCount: totalCourses,
-            lockMsg: `🔒 Completa los ${totalCourses} cursos de ${prevLangName} para desbloquear`
-        };
-    }
+    return {
+        unlocked: unlocked,
+        isCompleted: isCompleted,
+        completedCount: completedCount,
+        totalCount: totalCourses,
+        lockMsg: unlocked ? '' : `🔒 Completa los 4 cursos de ${prevLangName} para desbloquear`
+    };
 }
 
 function renderLangStepperBar() {
@@ -3504,8 +3483,8 @@ const LANGUAGE_PROGRESSION_SEQUENCE = [
 let isDocenteAdminMode = localStorage.getItem('devhub_docente_admin_mode') === 'true';
 
 function isLanguageUnlocked(langId) {
-    if (isAdminUser(userProfile)) {
-        return true; // 👑 El perfil Administrador Docente tiene los 8 lenguajes desbloqueados automáticamente
+    if (userProfile && (userProfile.isAdmin === true || (userProfile.email && userProfile.email.toLowerCase() === 'admin@fp.edu') || userProfile.masterUnlocked === true)) {
+        return true;
     }
 
     const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
