@@ -2001,6 +2001,12 @@ function handleUserLogout() {
         renderPdfGrid();
     }
     showToast('🚪 Has cerrado sesión correctamente.', 'info');
+
+    // Abrir el modal de inicio de sesión / registro para permitir iniciar sesión con otra cuenta
+    const modalOverlay = document.getElementById('user-modal-overlay');
+    if (modalOverlay) {
+        modalOverlay.classList.remove('hidden');
+    }
     switchAuthTab('login');
 }
 
@@ -2146,7 +2152,6 @@ function initUserModalEvents() {
     if (btnModalLogout) {
         btnModalLogout.addEventListener('click', () => {
             handleUserLogout();
-            modalOverlay.classList.add('hidden');
         });
     }
 }
