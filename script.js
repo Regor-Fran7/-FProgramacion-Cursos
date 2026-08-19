@@ -1537,14 +1537,14 @@ window.closePdfViewer = function closePdfViewer() {
    7. USER REGISTRATION & LESSON PROGRESS ENGINE
    ========================================================================== */
 const DEFAULT_GUEST_PROFILE = {
-    id: 'guest_estudiante',
-    name: 'Estudiante Invitado',
-    email: 'invitado@fp.edu',
-    fpDegree: 'Autodidacta / Entusiasta Tech',
-    avatar: '👨‍💻',
+    id: null,
+    name: 'Invitado',
+    email: '',
+    fpDegree: 'Sin Autenticar',
+    avatar: '👤',
     completedLessons: [],
     quizPoints: 0,
-    masterUnlocked: true
+    masterUnlocked: false
 };
 
 let userProfile = { ...DEFAULT_GUEST_PROFILE };
@@ -1703,17 +1703,18 @@ function saveUserProfile() {
 }
 
 function updateUserProfileUI() {
-    const isLogged = !!userProfile.id;
+    const isLogged = !!(userProfile && userProfile.id && userProfile.id !== 'guest_estudiante');
     const modalOverlay = document.getElementById('user-modal-overlay');
 
-    // Mandatory Auth Gate Rule: If not logged in, enforce registration as the FIRST page
+    // Mandatory Auth Gate Rule: If not logged in, enforce authentication lock (No guest access)
     if (!isLogged) {
         document.body.classList.add('auth-locked');
         if (modalOverlay) {
             modalOverlay.classList.remove('hidden');
             modalOverlay.classList.add('forced-gate');
         }
-        switchAuthTab('register');
+        const db = getUsersDB();
+        switchAuthTab(db && db.length > 0 ? 'login' : 'register');
     } else {
         document.body.classList.remove('auth-locked');
         if (modalOverlay) {
@@ -2000,14 +2001,7 @@ function handleUserLogout() {
     if (typeof renderPdfGrid === 'function') {
         renderPdfGrid();
     }
-    showToast('🚪 Has cerrado sesión correctamente.', 'info');
-
-    // Abrir el modal de inicio de sesión / registro para permitir iniciar sesión con otra cuenta
-    const modalOverlay = document.getElementById('user-modal-overlay');
-    if (modalOverlay) {
-        modalOverlay.classList.remove('hidden');
-    }
-    switchAuthTab('login');
+    showToast('🚪 Has cerrado sesión correctamente. Inicia sesión para continuar.', 'info');
 }
 
 /* Init Event Listeners */
