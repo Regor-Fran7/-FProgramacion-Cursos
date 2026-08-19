@@ -3572,10 +3572,15 @@ function initDocenteAdminToggle() {
 const COURSE_LEVEL_KEYS = ['c1', 'c2', 'c3', 'c4'];
 
 function isCourseCompleted(langId, levelKey) {
-    const key = `devhub_course_completed_${langId}_${levelKey}`;
-    if (localStorage.getItem(key) === 'true') return true;
-    if (userProfile && Array.isArray(userProfile.completedLessons)) {
-        if (userProfile.completedLessons.includes(`${langId}-${levelKey}`)) return true;
+    if (!userProfile || !userProfile.id) return false;
+    const lessonCode = `${langId}-${levelKey}`;
+    const userKey = `devhub_course_completed_${userProfile.id}_${langId}_${levelKey}`;
+
+    if (Array.isArray(userProfile.completedLessons) && userProfile.completedLessons.includes(lessonCode)) {
+        return true;
+    }
+    if (localStorage.getItem(userKey) === 'true') {
+        return true;
     }
     return false;
 }
@@ -3593,23 +3598,23 @@ function getLanguageCompletedCount(langId) {
 }
 
 function markCourseModuleAsCompleted(langId, levelKey) {
-    const passKey = `devhub_course_completed_${langId}_${levelKey}`;
+    if (!userProfile || !userProfile.id) return;
+
+    const userKey = `devhub_course_completed_${userProfile.id}_${langId}_${levelKey}`;
     const wasCompletedBefore = isCourseCompleted(langId, levelKey);
 
-    localStorage.setItem(passKey, 'true');
+    localStorage.setItem(userKey, 'true');
 
-    if (userProfile && userProfile.id) {
-        if (!userProfile.completedLessons) userProfile.completedLessons = [];
-        const lessonCode = `${langId}-${levelKey}`;
-        if (!userProfile.completedLessons.includes(lessonCode)) {
-            userProfile.completedLessons.push(lessonCode);
-        }
-        const db = getUsersDB();
-        const uIdx = db.findIndex(u => u.id === userProfile.id);
-        if (uIdx >= 0) {
-            db[uIdx] = userProfile;
-            saveUsersDB(db);
-        }
+    if (!userProfile.completedLessons) userProfile.completedLessons = [];
+    const lessonCode = `${langId}-${levelKey}`;
+    if (!userProfile.completedLessons.includes(lessonCode)) {
+        userProfile.completedLessons.push(lessonCode);
+    }
+    const db = getUsersDB();
+    const uIdx = db.findIndex(u => u.id === userProfile.id);
+    if (uIdx >= 0) {
+        db[uIdx] = userProfile;
+        saveUsersDB(db);
     }
 
     updateLanguageSelectorUI();
