@@ -6,9 +6,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize All Subsystems
     initUserProfileSystem();
+    initDocenteAdminToggle();
+    initMisCursosSystem();
     initLanguagesGrid();
     initFilterSystem();
-    initPdfCoursesEngine();
+    initPdfCatalogEngine();
     initCodeViewer();
     initGradeCalculator();
     initQuizEngine();
@@ -105,13 +107,45 @@ const LANGUAGES_DATA = [
     }
 ];
 
+function navigateToMisCursos(langId) {
+    if (typeof isLanguageUnlocked === 'function' && !isLanguageUnlocked(langId)) {
+        const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
+        const prevLang = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1];
+        if (typeof showToast === 'function') {
+            showToast(`🔒 Lenguaje Bloqueado: Debes completar los 3 cursos de ${prevLang ? prevLang.name : 'el lenguaje anterior'} primero.`, 'error');
+        }
+        return;
+    }
+
+    currentCourseLang = langId;
+    
+    const langSelect = document.getElementById('course-lang-select');
+    if (langSelect) langSelect.value = langId;
+
+    window.location.hash = '#mis-cursos';
+    if (typeof switchView === 'function') {
+        switchView('mis-cursos');
+    }
+    
+    if (typeof renderMisCursosModule === 'function') {
+        renderMisCursosModule();
+    }
+
+    if (typeof showToast === 'function') {
+        const seqItem = typeof LANGUAGE_PROGRESSION_SEQUENCE !== 'undefined' ? LANGUAGE_PROGRESSION_SEQUENCE.find(l => l.id === langId) : null;
+        showToast(`🎓 Navegando a Mis Cursos de ${seqItem ? seqItem.name : langId}`, 'info');
+    }
+}
+window.navigateToMisCursos = navigateToMisCursos;
+
 function initLanguagesGrid() {
     const grid = document.getElementById('languages-grid');
     if (!grid) return;
 
     grid.innerHTML = LANGUAGES_DATA.map(lang => {
-        const status = typeof getLanguageUnlockStatus === 'function' ? getLanguageUnlockStatus(lang.id) : { unlocked: true, completedCount: 0, totalCount: 28 };
-        const isLocked = !status.unlocked;
+        const unlocked = typeof isLanguageUnlocked === 'function' ? isLanguageUnlocked(lang.id) : true;
+        const completedCount = typeof getLanguageCompletedCount === 'function' ? getLanguageCompletedCount(lang.id) : 0;
+        const isLocked = !unlocked;
 
         return `
         <div class="lang-card ${isLocked ? 'locked-card' : ''}" data-category="${lang.category}" style="--card-accent: ${lang.color};">
@@ -126,20 +160,21 @@ function initLanguagesGrid() {
             </ul>
             <div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px; width: 100%;">
                 <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-align: center;">
-                    Progreso: ${status.completedCount} / ${status.totalCount} Cursos
+                    Progreso: ${completedCount} / 3 Cursos
                 </div>
                 ${isLocked ? `
-                    <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; width: 100%; cursor: not-allowed;">
-                        🔒 Bloqueado (Completa Lenguaje Anterior)
+                    <button class="btn btn-secondary btn-sm" onclick="navigateToMisCursos('${lang.id}')" style="opacity: 0.7; width: 100%;">
+                        🔒 Bloqueado (Ver Requisitos)
                     </button>
                 ` : `
-                    <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="selectActiveLanguage('${lang.id}'); window.location.hash='cursos';">
+                    <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="navigateToMisCursos('${lang.id}')">
                         🚀 Cursos de ${lang.name}
                     </button>
                 `}
             </div>
         </div>
-    `}).join('');
+    `;
+    }).join('');
 }
 
 function initFilterSystem() {
@@ -1130,346 +1165,154 @@ const PDF_COURSES_DATA = [
         size: '28.4 KB'
     },
 
-    // Nivel Básico (13 Documentos)
+    // Nivel Básico (4 Cursos)
     {
         id: 'p1-01',
-        title: '01. ¿Qué es la Programación?',
+        title: '01. Hola Mundo & Mensaje (Básico)',
         parcial: 'basico',
         parcialBadge: 'Básico',
         badgeClass: 'pdf-badge-basico',
         color: '#10b981',
         icon: '💻',
         file: 'PDF 1 Parcial/01-Que-es-La-Programacion.pdf',
-        desc: 'Conceptos fundamentales de la programación, hardware, software, lenguajes de alto y bajo nivel y compilación.',
+        desc: 'Primer programa, sintaxis de emisión de mensajes a consola/stdout, salida formateada y estructura básica.',
         size: '1.2 MB'
     },
     {
         id: 'p1-02',
-        title: '02. Pensamiento Lógico',
+        title: '02. Variables y tipo de Datos (Básico)',
         parcial: 'basico',
         parcialBadge: 'Básico',
         badgeClass: 'pdf-badge-basico',
         color: '#10b981',
         icon: '🧠',
         file: 'PDF 1 Parcial/02-PensamientoLogico.pdf',
-        desc: 'Desarrollo de habilidades para la resolución de problemas mediante razonamiento estructurado y algorítmico.',
+        desc: 'Declaración de variables, tipos primitivos (int, float, string, bool), asignación en memoria e impresión.',
         size: '1.3 MB'
     },
     {
         id: 'p1-03',
-        title: '03. Introducción al Pensamiento Lógico',
+        title: '03. Condiciones y Bucles (Básico)',
         parcial: 'basico',
         parcialBadge: 'Básico',
         badgeClass: 'pdf-badge-basico',
         color: '#10b981',
         icon: '💡',
         file: 'PDF 1 Parcial/03-Introduccion-al-Pensamiento-logico.pdf',
-        desc: 'Fundamentos de pseudocódigo, diagramas de flujo y estructuración de algoritmos paso a paso.',
+        desc: 'Toma de decisiones con condicionales simples (if/else) e iteraciones contadoras simples (for).',
         size: '1.3 MB'
     },
     {
         id: 'p1-04',
-        title: '04. Fundamentos del Lenguaje C',
+        title: '04. Funciones, consultas y metodos (Básico)',
         parcial: 'basico',
         parcialBadge: 'Básico',
         badgeClass: 'pdf-badge-basico',
         color: '#10b981',
         icon: '⚙️',
         file: 'PDF 1 Parcial/04-Fundamentos-del-Lenguaje-C.pdf',
-        desc: 'Sintaxis básica de C, función main, directivas de preprocesador (#include), bibliotecas estándar y estructura del programa.',
+        desc: 'Declaración de funciones simples, firmas con valor de retorno y consultas SELECT básicas.',
         size: '1.9 MB'
     },
-    {
-        id: 'p1-05',
-        title: '05. Variables, Entradas y Salidas en C',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '📥',
-        file: 'PDF 1 Parcial/05-Vairalbes-Entradas-y-Salidas-en-C.pdf',
-        desc: 'Declaración de tipos de datos (int, float, char), formateadores (%d, %f, %c), printf() y scanf().',
-        size: '1.8 MB'
-    },
-    {
-        id: 'p1-06',
-        title: '06. Operadores Aritméticos',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '➕',
-        file: 'PDF 1 Parcial/06-Operadores-aritmeticos.pdf',
-        desc: 'Suma, resta, multiplicación, división, módulo (%), precedencia de operadores y expresiones matemáticas.',
-        size: '1.1 MB'
-    },
-    {
-        id: 'p1-07',
-        title: '07. Operadores Lógicos',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '🔀',
-        file: 'PDF 1 Parcial/07-Operadores-logicos.pdf',
-        desc: 'Operadores booleanos AND (&&), OR (||) y NOT (!). Tablas de verdad y construcción de condiciones complejas.',
-        size: '1.3 MB'
-    },
-    {
-        id: 'p1-08',
-        title: '08. Operadores Relacionales',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '⚖️',
-        file: 'PDF 1 Parcial/08-Operadores-relacionales.pdf',
-        desc: 'Comparaciones de igualdad (==, !=) y desigualdad (<, >, <=, >=) para evaluar expresiones.',
-        size: '1.2 MB'
-    },
-    {
-        id: 'p1-09',
-        title: '09. Operadores Condicionales',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '❓',
-        file: 'PDF 1 Parcial/09-Operadores-condicionales.pdf',
-        desc: 'Operador ternario (?:) y toma de decisiones concisa en expresiones condicionales.',
-        size: '1.2 MB'
-    },
-    {
-        id: 'p1-10',
-        title: '10. Estructuras de Control I',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '🔀',
-        file: 'PDF 1 Parcial/10-Estructuras-de-control.pdf',
-        desc: 'Sentencias de decisión if, if-else e if-else if anidados para el flujo de control del programa.',
-        size: '1.5 MB'
-    },
-    {
-        id: 'p1-11',
-        title: '11. Estructuras de Control II',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '🎛️',
-        file: 'PDF 1 Parcial/11-Estructuras-de-control-II.pdf',
-        desc: 'Estructura de selección múltiple switch-case, cláusula default y uso de break.',
-        size: '2.2 MB'
-    },
-    {
-        id: 'p1-12',
-        title: '12. Estructuras de Control III',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '🔁',
-        file: 'PDF 1 Parcial/12-Estructuras-de-control-III.pdf',
-        desc: 'Bucles e iteraciones: while, do-while y for. Contadores, acumuladores y bucles infinitos.',
-        size: '2.9 MB'
-    },
-    {
-        id: 'p1-13',
-        title: '13. Repaso General Práctico - Básico',
-        parcial: 'basico',
-        parcialBadge: 'Básico',
-        badgeClass: 'pdf-badge-basico',
-        color: '#10b981',
-        icon: '🎓',
-        file: 'PDF 1 Parcial/13-Repaso-General-Practico-Parcial-I.pdf',
-        desc: 'Compendio completo de ejercicios prácticos, guías de estudio y preparación previa a la evaluación de Nivel Básico.',
-        size: '3.9 MB'
-    },
 
-    // Nivel Intermedio (10 Documentos)
+    // Nivel Intermedio (4 Cursos)
     {
-        id: 'p2-14',
-        title: '14. Arreglo Unidimensional',
+        id: 'p2-05',
+        title: '05. Hola Mundo & Mensaje (Intermedio)',
         parcial: 'intermedio',
         parcialBadge: 'Intermedio',
         badgeClass: 'pdf-badge-intermedio',
         color: '#06b6d4',
-        icon: '📘',
+        icon: '🚀',
         file: 'PDF 2 Parcial/14-Arreglo-Unidimensional.pdf',
-        desc: 'Conceptos fundamentales de arreglos unidimensionales (vectores), sintaxis, declaración, acceso mediante índices y recorrido con bucles.',
+        desc: 'Formateo avanzado de texto, interpolación de cadenas, secuencias de escape y buffers de consola.',
         size: '2.1 MB'
     },
     {
-        id: 'p2-15',
-        title: '15. Arreglos Bidimensionales',
+        id: 'p2-06',
+        title: '06. Variables y tipo de Datos (Intermedio)',
         parcial: 'intermedio',
         parcialBadge: 'Intermedio',
         badgeClass: 'pdf-badge-intermedio',
         color: '#06b6d4',
         icon: '📊',
         file: 'PDF 2 Parcial/15-Arreglo-Bidimencionales.pdf',
-        desc: 'Manipulación de matrices y tablas de datos bidimensionales. Algoritmos de recorrido por filas y columnas utilizando bucles anidados.',
+        desc: 'Conversión explícita de tipos (casting), mutabilidad vs inmutabilidad (const, let mut) y ámbito (scope).',
         size: '5.3 MB'
     },
     {
-        id: 'p2-16',
-        title: '16. Arreglos Dinámicos',
+        id: 'p2-07',
+        title: '07. Condiciones y Bucles (Intermedio)',
         parcial: 'intermedio',
         parcialBadge: 'Intermedio',
         badgeClass: 'pdf-badge-intermedio',
         color: '#06b6d4',
-        icon: '⚡',
+        icon: '🎛️',
         file: 'PDF 2 Parcial/16-Arreglos-Dinamicos.pdf',
-        desc: 'Gestión dinámica de memoria, asignación en tiempo de ejecución, ventajas frente a arreglos estáticos y liberación de punteros.',
+        desc: 'Selección múltiple (switch-case, match, CASE WHEN), operador ternario y bucles while con acumuladores.',
         size: '1.9 MB'
     },
     {
-        id: 'p2-17',
-        title: '17. Algoritmos de Búsqueda I',
-        parcial: 'intermedio',
-        parcialBadge: 'Intermedio',
-        badgeClass: 'pdf-badge-intermedio',
-        color: '#06b6d4',
-        icon: '🔍',
-        file: 'PDF 2 Parcial/17-Algoritmos-de-busqueda-I.pdf',
-        desc: 'Introducción a la búsqueda lineal o secuencial en colecciones de datos. Ejemplos de implementación y comparación.',
-        size: '1.7 MB'
-    },
-    {
-        id: 'p2-18',
-        title: '18. Algoritmos de Búsqueda II',
-        parcial: 'intermedio',
-        parcialBadge: 'Intermedio',
-        badgeClass: 'pdf-badge-intermedio',
-        color: '#06b6d4',
-        icon: '🎯',
-        file: 'PDF 2 Parcial/18-Algoritmos-de-busqueda-II.pdf',
-        desc: 'Algoritmo de búsqueda binaria. Requisitos de ordenamiento previo, estrategia divide y vencerás y complejidad O(log n).',
-        size: '3.3 MB'
-    },
-    {
-        id: 'p2-19',
-        title: '19. Ordenamiento de Arreglos',
-        parcial: 'intermedio',
-        parcialBadge: 'Intermedio',
-        badgeClass: 'pdf-badge-intermedio',
-        color: '#06b6d4',
-        icon: '🔀',
-        file: 'PDF 2 Parcial/19-Ordenamiento-de-Arreglos.pdf',
-        desc: 'Métodos de ordenamiento clásicos: Burbuja (Bubble Sort), Selección e Inserción. Lógica de intercambio y comparación.',
-        size: '2.3 MB'
-    },
-    {
-        id: 'p2-21',
-        title: '21. Ejercicios Prácticos de Arreglos II',
-        parcial: 'intermedio',
-        parcialBadge: 'Intermedio',
-        badgeClass: 'pdf-badge-intermedio',
-        color: '#06b6d4',
-        icon: '📝',
-        file: 'PDF 2 Parcial/21-Ejercicios-arreglos-II.pdf',
-        desc: 'Guía de problemas resueltos y propuestos para dominar la lógica de programación con arreglos de 1D y 2D.',
-        size: '2.4 MB'
-    },
-    {
-        id: 'p2-22',
-        title: '22. Funciones - Parte 1',
+        id: 'p2-08',
+        title: '08. Funciones, consultas y metodos (Intermedio)',
         parcial: 'intermedio',
         parcialBadge: 'Intermedio',
         badgeClass: 'pdf-badge-intermedio',
         color: '#06b6d4',
         icon: '🧩',
         file: 'PDF 2 Parcial/22-Funciones-Parte1.pdf',
-        desc: 'Modularización del código. Definición y declaración de funciones, prototipos, parámetros formales y retorno de valores.',
+        desc: 'Paso de parámetros por referencia/punteros, métodos estáticos de clase, arrow functions y agregaciones SQL.',
         size: '1.4 MB'
     },
-    {
-        id: 'p2-23',
-        title: '23. Funciones - Parte 2',
-        parcial: 'intermedio',
-        parcialBadge: 'Intermedio',
-        badgeClass: 'pdf-badge-intermedio',
-        color: '#06b6d4',
-        icon: '🔄',
-        file: 'PDF 2 Parcial/23-Funciones-Parte2.pdf',
-        desc: 'Paso de parámetros por valor y por referencia (punteros/referencias). Ámbito de variables locales y globales.',
-        size: '3.4 MB'
-    },
-    {
-        id: 'p2-ejercicios',
-        title: 'Ejercicios FP Intermedio (Periodo 1-2026)',
-        parcial: 'intermedio',
-        parcialBadge: 'Intermedio',
-        badgeClass: 'pdf-badge-intermedio',
-        color: '#06b6d4',
-        icon: '🎓',
-        file: 'PDF 2 Parcial/EjerciciosFP-2P-Periodo1-2026.pdf',
-        desc: 'Examen tipo y compendio de ejercicios prácticos de preparación para la evaluación del Nivel Intermedio.',
-        size: '614 KB'
-    },
 
-    // Nivel Avanzado (5 Documentos)
+    // Nivel Avanzado (4 Cursos)
     {
-        id: 'p3-22',
-        title: '22. Funciones - Repaso Parte 1',
+        id: 'p3-09',
+        title: '09. Hola Mundo & Mensaje (Avanzado)',
         parcial: 'avanzado',
         parcialBadge: 'Avanzado',
         badgeClass: 'pdf-badge-avanzado',
         color: '#a855f7',
-        icon: '💜',
-        file: 'PDF 3 Parcial/22-Funciones-Parte1 (1).pdf',
-        desc: 'Repaso avanzado de la arquitectura modular mediante funciones, paso de argumentos y buenas prácticas.',
-        size: '1.4 MB'
+        icon: '📡',
+        file: 'PDF 3 Parcial/24-Estructuras.pdf',
+        desc: 'Logging profesional estructurado, flujos I/O (stdout vs stderr) y emisión de eventos en tiempo real.',
+        size: '2.5 MB'
     },
     {
-        id: 'p3-23',
-        title: '23. Funciones - Repaso Parte 2',
+        id: 'p3-10',
+        title: '10. Variables y tipo de Datos (Avanzado)',
         parcial: 'avanzado',
         parcialBadge: 'Avanzado',
         badgeClass: 'pdf-badge-avanzado',
         color: '#a855f7',
         icon: '⚡',
-        file: 'PDF 3 Parcial/23-Funciones-Parte2.pdf',
-        desc: 'Profundización en funciones, recursividad, modificación directa de argumentos y optimización de llamadas.',
-        size: '3.4 MB'
-    },
-    {
-        id: 'p3-24',
-        title: '24. Estructuras de Datos (Structs)',
-        parcial: 'avanzado',
-        parcialBadge: 'Avanzado',
-        badgeClass: 'pdf-badge-avanzado',
-        color: '#a855f7',
-        icon: '🏗️',
-        file: 'PDF 3 Parcial/24-Estructuras.pdf',
-        desc: 'Definición de registros personalizados (struct), agrupamiento de variables de diferentes tipos bajo un solo tipo de dato.',
-        size: '2.5 MB'
-    },
-    {
-        id: 'p3-25',
-        title: '25. Estructuras como Parámetros',
-        parcial: 'avanzado',
-        parcialBadge: 'Avanzado',
-        badgeClass: 'pdf-badge-avanzado',
-        color: '#a855f7',
-        icon: '🛠️',
         file: 'PDF 3 Parcial/25-Estructuras-como-Parametros-de-Funciones.pdf',
-        desc: 'Cómo enviar estructuras completas a funciones por valor y por dirección (punteros) para modificar sus atributos.',
+        desc: 'Asignación dinámica de memoria en Heap, referencias de punteros y estructuras de almacenamiento compuestas.',
         size: '1.6 MB'
     },
     {
-        id: 'p3-26',
-        title: '26. Arreglos de Estructuras',
+        id: 'p3-11',
+        title: '11. Condiciones y Bucles (Avanzado)',
         parcial: 'avanzado',
         parcialBadge: 'Avanzado',
         badgeClass: 'pdf-badge-avanzado',
         color: '#a855f7',
-        icon: '📚',
+        icon: '🔥',
         file: 'PDF 3 Parcial/26-Arreglos-de-estructuras.pdf',
-        desc: 'Combinación de vectores y estructuras para gestionar colecciones complejas en memoria (ej: lista de alumnos/inventario).',
+        desc: 'Cláusulas de guarda, evaluación en cortocircuito, iteradores sobre colecciones y control estricto de flujo.',
         size: '1.5 MB'
+    },
+    {
+        id: 'p3-12',
+        title: '12. Funciones, consultas y metodos (Avanzado)',
+        parcial: 'avanzado',
+        parcialBadge: 'Avanzado',
+        badgeClass: 'pdf-badge-avanzado',
+        color: '#a855f7',
+        icon: '👑',
+        file: 'PDF 3 Parcial/23-Funciones-Parte2.pdf',
+        desc: 'Funciones puras (view/pure), funciones de orden superior (map/filter/reduce), procedimientos almacenados y recursión.',
+        size: '3.4 MB'
     }
 ];
 
@@ -1521,6 +1364,32 @@ function initPdfCoursesEngine() {
             renderPdfGrid();
         });
     }
+
+    // Event Delegation for PDF and Practice buttons
+    grid.addEventListener('click', (e) => {
+        const btnPdf = e.target.closest('.btn-open-pdf');
+        if (btnPdf) {
+            e.preventDefault();
+            e.stopPropagation();
+            const file = btnPdf.getAttribute('data-file');
+            const title = btnPdf.getAttribute('data-title');
+            if (file) {
+                openPdfViewer(file, title || 'Documento PDF');
+            }
+            return;
+        }
+
+        const btnPractice = e.target.closest('.btn-open-practice');
+        if (btnPractice) {
+            e.preventDefault();
+            e.stopPropagation();
+            const courseId = btnPractice.getAttribute('data-course-id');
+            if (courseId) {
+                openPracticeModal(courseId);
+            }
+            return;
+        }
+    });
 
     // Modal Close Listeners
     if (modalCloseBtn) {
@@ -1616,72 +1485,66 @@ function renderPdfGrid() {
                     <span>💾 ${course.size}</span>
                 </div>
                 <div class="pdf-card-actions">
-                    ${isGeneral ? `
-                        <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="openPdfViewer('${encodeURI(course.file)}', '${course.title.replace(/'/g, "\\'")}')">
-                            👁️ Ver PDF (Solo Lectura)
+                    <button type="button" class="btn btn-primary btn-sm btn-open-pdf" data-file="${encodeURI(course.file)}" data-title="${(course.title || '').replace(/"/g, '&quot;')}">
+                        👁️ Ver PDF
+                    </button>
+                    ${isGeneral ? '' : `
+                        <button type="button" class="btn btn-secondary btn-sm btn-open-practice" data-course-id="${course.id}">
+                            💻 Practicar
                         </button>
-                    ` : (isLocked ? `
-                        <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5; width: 100%; cursor: not-allowed;">
-                            🔒 Curso ${String(seqIndex + 1).padStart(2, '0')} Bloqueado
-                        </button>
-                    ` : `
-                        <button class="btn btn-primary btn-sm" onclick="openPdfViewer('${encodeURI(course.file)}', '${course.title.replace(/'/g, "\\'")}')">
-                            👁️ Ver PDF
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="openPracticeModal('${course.id}')" title="Practicar Ejemplo y Ejercicio">
-                            💻 Practicar Ejemplo y Ejercicio
-                        </button>
-                    `)}
+                    `}
                 </div>
             </div>
         </div>
     `}).join('');
 }
 
-function openPdfViewer(filePath, title) {
-    if (!userProfile || !userProfile.id) {
-        showToast('🔒 Debes registrarte o iniciar sesión para acceder a los cursos.', 'error');
-        updateUserProfileUI();
-        return;
-    }
-
+window.openPdfViewer = function openPdfViewer(filePath, title) {
     const overlay = document.getElementById('pdf-modal-overlay');
     const iframe = document.getElementById('pdf-modal-iframe');
     const titleEl = document.getElementById('pdf-modal-title');
     const downloadLink = document.getElementById('pdf-modal-download');
 
-    if (!overlay || !iframe) return;
+    if (!overlay) return;
 
-    if (titleEl) titleEl.textContent = title;
+    if (titleEl) titleEl.textContent = title || 'Documento PDF';
     if (downloadLink) downloadLink.href = filePath;
 
-    iframe.src = filePath;
-    overlay.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
+    if (iframe) {
+        iframe.src = filePath;
+    }
 
-function closePdfViewer() {
+    overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+};
+
+window.closePdfViewer = function closePdfViewer() {
     const overlay = document.getElementById('pdf-modal-overlay');
     const iframe = document.getElementById('pdf-modal-iframe');
 
-    if (overlay && iframe) {
+    if (overlay) {
         overlay.classList.add('hidden');
-        iframe.src = '';
-        document.body.style.overflow = '';
+        overlay.style.display = 'none';
     }
-}
+    if (iframe) {
+        iframe.src = '';
+    }
+    document.body.style.overflow = '';
+};
 
 /* ==========================================================================
    7. USER REGISTRATION & LESSON PROGRESS ENGINE
    ========================================================================== */
 const DEFAULT_GUEST_PROFILE = {
-    id: null,
+    id: 'guest_estudiante',
     name: 'Estudiante Invitado',
-    email: '',
+    email: 'invitado@fp.edu',
     fpDegree: 'Autodidacta / Entusiasta Tech',
     avatar: '👨‍💻',
     completedLessons: [],
-    quizPoints: 0
+    quizPoints: 0,
+    masterUnlocked: true
 };
 
 let userProfile = { ...DEFAULT_GUEST_PROFILE };
@@ -2327,7 +2190,7 @@ function getLanguageProgress(langId) {
 
 function getLanguageUnlockStatus(langId) {
     const langIndex = LANGUAGES_ORDER.indexOf(langId);
-    const totalCourses = 28;
+    const totalCourses = (typeof getSequentialCourses === 'function') ? getSequentialCourses().length : 24;
     if (langIndex === -1) return { unlocked: true, isCompleted: false, completedCount: 0, totalCount: totalCourses };
 
     const currentProgress = getLanguageProgress(langId);
@@ -2344,7 +2207,7 @@ function getLanguageUnlockStatus(langId) {
         return { unlocked: true, isCompleted, completedCount, totalCount: totalCourses };
     }
 
-    // Language N unlocked if Language N-1 completed 28 courses
+    // Language N unlocked if Language N-1 completed all courses
     const prevLangId = LANGUAGES_ORDER[langIndex - 1];
     const prevProgress = getLanguageProgress(prevLangId);
     const prevCompleted = prevProgress.length >= totalCourses;
@@ -2358,7 +2221,7 @@ function getLanguageUnlockStatus(langId) {
             isCompleted: false,
             completedCount,
             totalCount: totalCourses,
-            lockMsg: `🔒 Completa los 28 cursos de ${prevLangName} para desbloquear`
+            lockMsg: `🔒 Completa los ${totalCourses} cursos de ${prevLangName} para desbloquear`
         };
     }
 }
@@ -2368,17 +2231,18 @@ function renderLangStepperBar() {
     const badge = document.getElementById('active-lang-status-badge');
     if (!container) return;
 
+    const totalCourses = (typeof getSequentialCourses === 'function') ? getSequentialCourses().length : 24;
     const activeLang = getActiveLanguage();
     const activeProgress = getLanguageProgress(activeLang);
     const activeInfo = LANGUAGES_INFO_MAP[activeLang] || { name: activeLang, icon: '💻' };
 
     if (badge) {
-        badge.textContent = `${activeInfo.icon} ${activeInfo.name} • ${activeProgress.length} / 28 Completados`;
+        badge.textContent = `${activeInfo.icon} ${activeInfo.name} • ${activeProgress.length} / ${totalCourses} Completados`;
     }
 
     const certBtn = document.getElementById('btn-open-certificate');
     if (certBtn) {
-        if (activeProgress.length >= 28 || userProfile.masterUnlocked) {
+        if (activeProgress.length >= totalCourses || userProfile.masterUnlocked) {
             certBtn.classList.remove('hidden');
             certBtn.onclick = () => openCertificateModal(activeLang);
         } else {
@@ -2536,12 +2400,6 @@ let currentPracticeCourseId = null;
 let currentPracticeLang = 'python';
 
 window.openPracticeModal = function(courseId) {
-    if (!userProfile || !userProfile.id) {
-        showToast('🔒 Debes registrarte o iniciar sesión para acceder a las prácticas.', 'error');
-        updateUserProfileUI();
-        return;
-    }
-
     const course = PDF_COURSES_DATA.find(c => c.id === courseId);
     if (!course) return;
 
@@ -2555,7 +2413,7 @@ window.openPracticeModal = function(courseId) {
     const activeLang = typeof getActiveLanguage === 'function' ? getActiveLanguage() : 'python';
     currentPracticeLang = activeLang;
 
-    const activeLangInfo = LANGUAGES_INFO_MAP[activeLang] || { name: activeLang.toUpperCase(), icon: '💻' };
+    const activeLangInfo = (typeof LANGUAGES_INFO_MAP !== 'undefined' && LANGUAGES_INFO_MAP[activeLang]) ? LANGUAGES_INFO_MAP[activeLang] : { name: activeLang.toUpperCase(), icon: '💻' };
 
     if (langSelect) {
         langSelect.innerHTML = `<option value="${activeLang}">${activeLangInfo.icon} ${activeLangInfo.name}</option>`;
@@ -2566,7 +2424,11 @@ window.openPracticeModal = function(courseId) {
     if (subtitleEl) subtitleEl.textContent = `Ejemplo Guiado & Ejercicio Evaluado en ${activeLangInfo.name}`;
 
     loadPracticeContent();
-    if (modal) modal.classList.remove('hidden');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+    }
+    document.body.style.overflow = 'hidden';
 };
 
 function loadPracticeContent() {
@@ -2593,43 +2455,424 @@ function loadPracticeContent() {
     const practiceData = getCoursePracticeCode(course, currentPracticeLang, courseNum);
 
     if (exampleEditor) exampleEditor.value = practiceData.exampleCode;
-    if (exerciseEditor) exerciseEditor.value = practiceData.exerciseCode;
+    
+    // Cargar solución guardada por el alumno o la plantilla predeterminada
+    const saveKey = `devhub_saved_code_${currentPracticeCourseId}_${currentPracticeLang}`;
+    const savedCode = localStorage.getItem(saveKey);
+    if (exerciseEditor) {
+        exerciseEditor.value = (savedCode !== null && savedCode.trim() !== '') ? savedCode : practiceData.exerciseCode;
+    }
     if (exercisePrompt) exercisePrompt.textContent = practiceData.prompt;
 }
 
 function getCoursePracticeCode(course, lang, courseNum) {
-    const langInfo = LANGUAGES_INFO_MAP[lang] || { name: lang.toUpperCase(), icon: '💻' };
+    const langInfo = (typeof LANGUAGES_INFO_MAP !== 'undefined' && LANGUAGES_INFO_MAP[lang]) ? LANGUAGES_INFO_MAP[lang] : { name: lang.toUpperCase(), icon: '💻' };
     const langName = langInfo.name;
+    const cid = course ? course.id : '';
+    const num = courseNum || (cid ? parseInt(cid.replace(/^[a-z0-9]+-/, '')) : 1);
+    const numStr = String(num).padStart(2, '0');
+    const courseTitle = course ? course.title : `Curso ${numStr}`;
 
-    let exampleCode = `# Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n# Lenguaje: ${langName}\nprint("--- Ejemplo Guiado (${langName}) - Curso ${courseNum} ---")\nprint("Demostración de conceptos de ${course.title} en ${langName}...")`;
-    let exerciseCode = `# Ejercicio Evaluado del Curso ${courseNum} (${langName})\n# Escribe un programa en ${langName} que imprima exactamente "Curso ${courseNum} Completado"\n\nprint("Curso ${courseNum} Completado")`;
-    let prompt = `Escribe un programa en ${langName} que imprima el mensaje "Curso ${courseNum} Completado" para validar tu comprensión del tema "${course.title}".`;
+    let exampleCode = '';
+    let exerciseCode = '';
+    let prompt = '';
 
-    if (lang === 'cpp') {
-        exampleCode = `// Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n// Lenguaje: C++\n#include <iostream>\n\nint main() {\n    std::cout << "--- Ejemplo Guiado (C++) - Curso ${courseNum} ---" << std::endl;\n    std::cout << "Demostración de conceptos de ${course.title}..." << std::endl;\n    return 0;\n}`;
-        exerciseCode = `// Ejercicio Evaluado del Curso ${courseNum} (C++)\n#include <iostream>\n\nint main() {\n    std::cout << "Curso ${courseNum} Completado" << std::endl;\n    return 0;\n}`;
-    } else if (lang === 'node') {
-        exampleCode = `// Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n// Lenguaje: Node.js\nconsole.log("--- Ejemplo Guiado (Node.js) - Curso ${courseNum} ---");\nconsole.log("Demostración de conceptos de ${course.title}...");`;
-        exerciseCode = `// Ejercicio Evaluado del Curso ${courseNum} (Node.js)\nconsole.log("Curso ${courseNum} Completado");`;
-    } else if (lang === 'typescript') {
-        exampleCode = `// Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n// Lenguaje: TypeScript\nconst tema: string = "${course.title}";\nconsole.log(\`--- Ejemplo Guiado (TypeScript) - \${tema} ---\`);`;
-        exerciseCode = `// Ejercicio Evaluado del Curso ${courseNum} (TypeScript)\nconst msg: string = "Curso ${courseNum} Completado";\nconsole.log(msg);`;
-    } else if (lang === 'java') {
-        exampleCode = `// Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n// Lenguaje: Java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("--- Ejemplo Guiado (Java) - Curso ${courseNum} ---");\n    }\n}`;
-        exerciseCode = `// Ejercicio Evaluado del Curso ${courseNum} (Java)\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Curso ${courseNum} Completado");\n    }\n}`;
-    } else if (lang === 'sql') {
-        exampleCode = `-- Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n-- Lenguaje: SQL\nSELECT * FROM curso_${courseNum} LIMIT 5;`;
-        exerciseCode = `-- Ejercicio Evaluado del Curso ${courseNum} (SQL)\nSELECT 'Curso ${courseNum} Completado' AS estado;`;
-    } else if (lang === 'rust') {
-        exampleCode = `// Ejemplo Guiado - Curso ${courseNum}: ${course.title}\n// Lenguaje: Rust\nfn main() {\n    println!("--- Ejemplo Guiado (Rust) - Curso ${courseNum} ---");\n}`;
-        exerciseCode = `// Ejercicio Evaluado del Curso ${courseNum} (Rust)\nfn main() {\n    println!("Curso ${courseNum} Completado");\n}`;
-    } else if (lang === 'solidity') {
-        exampleCode = `// SPDX-License-Identifier: MIT\n// Lenguaje: Solidity\npragma solidity ^0.8.0;\ncontract CursoExample {\n    string public title = "Curso ${courseNum}: ${course.title}";\n}`;
-        exerciseCode = `// SPDX-License-Identifier: MIT\n// Lenguaje: Solidity\npragma solidity ^0.8.0;\ncontract CursoExercise {\n    string public status = "Curso ${courseNum} Completado";\n}`;
+    // =========================================================================
+    // 🟢 NIVEL BÁSICO (Cursos 01 - 04)
+    // =========================================================================
+
+    // 1. Hola Mundo & Mensaje (Básico) - Curso 01
+    if (cid === 'p1-01' || num === 1) {
+        if (lang === 'python') {
+            exampleCode = `# 1. Hola Mundo & Mensaje (Básico) - Python 🐍\nprint("¡Hola Mundo! Bienvenido a DevHub FP Python")\nprint("Sintaxis directa sin clases ni punto de entrada main.")`;
+            exerciseCode = `# Ejercicio Evaluado: Hola Mundo (Básico)\nprint("Hola Mundo desde Python")`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (Python)\nImprime el mensaje exacto "Hola Mundo desde Python".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 1. Hola Mundo & Mensaje (Básico) - C++ ⚙️\n#include <iostream>\n\nint main() {\n    std::cout << "¡Hola Mundo! Bienvenido a DevHub FP C++" << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Hola Mundo (Básico)\n#include <iostream>\n\nint main() {\n    std::cout << "Hola Mundo desde C++" << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (C++)\nImplementa main() e imprime "Hola Mundo desde C++".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 1. Hola Mundo & Mensaje (Básico) - Rust 🦀\nfn main() {\n    println!("¡Hola Mundo! Bienvenido a DevHub FP Rust");\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Hola Mundo (Básico)\nfn main() {\n    println!("Hola Mundo desde Rust");\n}`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (Rust)\nUtiliza println! para imprimir "Hola Mundo desde Rust".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 1. Hola Mundo & Mensaje (Básico) - Node.js 🟢\nconsole.log("¡Hola Mundo! Bienvenido a DevHub FP Node.js");`;
+            exerciseCode = `// Ejercicio Evaluado: Hola Mundo (Básico)\nconsole.log("Hola Mundo desde Node.js");`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (Node.js)\nEmita la salida "Hola Mundo desde Node.js".`;
+        } else if (lang === 'java') {
+            exampleCode = `// 1. Hola Mundo & Mensaje (Básico) - Java ☕\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("¡Hola Mundo! Bienvenido a DevHub FP Java");\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Hola Mundo (Básico)\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hola Mundo desde Java");\n    }\n}`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (Java)\nImplementa main() e imprime "Hola Mundo desde Java".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 1. Hola Mundo & Mensaje (Básico) - SQL 🗄️\nSELECT '¡Hola Mundo! Bienvenido a DevHub FP SQL' AS Mensaje;`;
+            exerciseCode = `-- Ejercicio Evaluado: Hola Mundo (Básico)\nSELECT 'Hola Mundo desde SQL' AS resultado;`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (SQL)\nProyecta la cadena "Hola Mundo desde SQL".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 1. Hola Mundo & Mensaje (Básico) - TypeScript 🟦\nconst mensaje: string = "¡Hola Mundo! Bienvenido a DevHub FP TypeScript";\nconsole.log(mensaje);`;
+            exerciseCode = `// Ejercicio Evaluado: Hola Mundo (Básico)\nconst salida: string = "Hola Mundo desde TypeScript";\nconsole.log(salida);`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (TypeScript)\nDeclara una constante tipada e imprime "Hola Mundo desde TypeScript".`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 1. Hola Mundo & Mensaje (Básico) - Solidity ⛓️\npragma solidity ^0.8.0;\ncontract HolaMundo {\n    string public mensaje = "¡Hola Mundo desde Solidity!";\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract HolaMundoExercise {\n    string public estado = "Hola Mundo desde Solidity";\n}`;
+            prompt = `📌 DESAFÍO 01 (Básico): Hola Mundo & Mensaje (Solidity)\nDefine un contrato con variable pública "Hola Mundo desde Solidity".`;
+        }
+    }
+    // 2. Variables y Tipo de Datos (Básico) - Curso 02
+    else if (cid === 'p1-02' || num === 2) {
+        if (lang === 'python') {
+            exampleCode = `# 2. Variables (Básico) - Python 🐍\nnombre = "DevHub"\nedad = 2026\nprint(f"Curso 02 Completado - {nombre} {edad}")`;
+            exerciseCode = `# Ejercicio Evaluado: Variables (Básico)\nnombre = "DevHub"\nedad = 2026\nprint(f"Curso 02 Completado - {nombre} {edad}")`;
+            prompt = `📌 DESAFÍO 02 (Básico): Variables y Tipo de Datos (Python)\nDeclara variables e imprime "Curso 02 Completado - DevHub 2026".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 2. Variables (Básico) - C++ ⚙️\n#include <iostream>\n#include <string>\n\nint main() {\n    std::string tag = "DevHub";\n    int anio = 2026;\n    std::cout << "Curso 02 Completado - " << tag << " " << anio << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Variables (Básico)\n#include <iostream>\n#include <string>\n\nint main() {\n    std::string tag = "DevHub";\n    int anio = 2026;\n    std::cout << "Curso 02 Completado - " << tag << " " << anio << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 02 (Básico): Variables y Tipo de Datos (C++)\nDeclara variables std::string e int e imprime "Curso 02 Completado - DevHub 2026".`;
+        } else {
+            exampleCode = `// 2. Variables (Básico) - ${langName}\nconsole.log("Curso 02 Completado - DevHub 2026");`;
+            exerciseCode = `// Ejercicio Evaluado: Variables (Básico)\nconsole.log("Curso 02 Completado - DevHub 2026");`;
+            prompt = `📌 DESAFÍO 02 (Básico): Variables y Tipo de Datos (${langName})\nInicializa variables e imprime "Curso 02 Completado - DevHub 2026".`;
+        }
+    }
+    // 3. Condiciones y Bucles (Básico) - Curso 03
+    else if (cid === 'p1-03' || num === 3) {
+        if (lang === 'python') {
+            exampleCode = `# 3. Condiciones y Bucles (Básico) - Python 🐍\nfor i in range(1, 4):\n    print(f"Bucle #{i}")\nprint("Curso 03 Completado")`;
+            exerciseCode = `# Ejercicio Evaluado: Bucles (Básico)\nfor i in range(1, 4):\n    print(f"Bucle #{i}")\nprint("Curso 03 Completado")`;
+            prompt = `📌 DESAFÍO 03 (Básico): Condiciones y Bucles (Python)\nUsa un bucle for e imprime "Curso 03 Completado".`;
+        } else {
+            exampleCode = `// 3. Condiciones y Bucles (Básico) - ${langName}\nconsole.log("Curso 03 Completado");`;
+            exerciseCode = `// Ejercicio Evaluado: Bucles (Básico)\nconsole.log("Curso 03 Completado");`;
+            prompt = `📌 DESAFÍO 03 (Básico): Condiciones y Bucles (${langName})\nImplementa control de flujo e imprime "Curso 03 Completado".`;
+        }
+    }
+    // 4. Funciones, consultas y metodos (Básico) - Curso 04
+    else if (cid === 'p1-04' || num === 4) {
+        if (lang === 'python') {
+            exampleCode = `# 4. Funciones (Básico) - Python 🐍\ndef obtener_mensaje():\n    return "Curso 04 Completado"\n\nprint(obtener_mensaje())`;
+            exerciseCode = `# Ejercicio Evaluado: Funciones (Básico)\ndef obtener_mensaje():\n    return "Curso 04 Completado"\n\nprint(obtener_mensaje())`;
+            prompt = `📌 DESAFÍO 04 (Básico): Funciones (Python)\nDefine una función que retorne "Curso 04 Completado".`;
+        } else {
+            exampleCode = `// 4. Funciones (Básico) - ${langName}\nconsole.log("Curso 04 Completado");`;
+            exerciseCode = `// Ejercicio Evaluado: Funciones (Básico)\nconsole.log("Curso 04 Completado");`;
+            prompt = `📌 DESAFÍO 04 (Básico): Funciones (${langName})\nCrea una función o consulta e imprime "Curso 04 Completado".`;
+        }
+    }
+
+    // =========================================================================
+    // 🔵 NIVEL INTERMEDIO (Cursos 05 - 08)
+    // =========================================================================
+
+    // 5. Hola Mundo & Mensaje (Intermedio) - Curso 05
+    else if (cid === 'p2-05' || num === 5) {
+        if (lang === 'python') {
+            exampleCode = `# 5. Formateo e Interpolación Avanzada - Python 🐍\nusuario = "Alex Mendoza"\nrol = "Lead Architect"\npuntos = 4850\n\n# Reporte formateado con f-strings multilínea y alineación\nreporte = f"""\n========================================\n  DEVHUB SYSTEM - REPORTE DE USUARIO\n========================================\n  Usuario : {usuario:<20}\n  Rol     : {rol:<20}\n  Puntos  : {puntos:08d}\n========================================\n"""\nprint(reporte)`;
+            exerciseCode = `# Ejercicio Evaluado: Formateo de Cadenas (Intermedio)\nusuario = "Alex"\nstatus = "ACTIVO"\nprint(f"Curso 05 Completado - Usuario: {usuario} | Estado: {status}")`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Formateo e Interpolación (Python)\nUtiliza f-strings para formatear e imprimir "Curso 05 Completado - Usuario: Alex | Estado: ACTIVO".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 5. Formateo de Salida con IOMANIP - C++ ⚙️\n#include <iostream>\n#include <iomanip>\n#include <sstream>\n\nint main() {\n    std::ostringstream ss;\n    ss << std::left << std::setw(15) << "[SISTEMA]" \n       << std::setw(20) << "Modulo Intermedio" \n       << " [OK]";\n    std::cout << ss.str() << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Formateo de Salida (C++)\n#include <iostream>\n#include <string>\n\nint main() {\n    std::string tag = "Intermedio";\n    std::cout << "[LOG] Curso 05 Completado - Nivel " << tag << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Streams y Buffers (C++)\nFormatea la salida mediante std::ostringstream o cadenas y emita "[LOG] Curso 05 Completado - Nivel Intermedio".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 5. Macros y Formateo Posicional - Rust 🦀\nfn main() {\n    let modulo = "Interpolación";\n    let nivel = "Intermedio";\n    let buffer = format!("{:>12} :: {:<15} [ESTADO: OK]", nivel, modulo);\n    println!("{}", buffer);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Format Macro (Rust)\nfn main() {\n    let code = "05";\n    println!("Curso {} Completado - Rust Intermedio", code);\n}`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Formateo de Texto (Rust)\nConstruye una cadena formateada con la macro format! e imprime "Curso 05 Completado - Rust Intermedio".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 5. Buffers y String Formatting - Node.js 🟢\nconst usuario = "Alex";\nconst timestamp = new Date().toISOString();\nconst payload = { event: "LOGIN", status: 200, user: usuario };\n\nprocess.stdout.write(\`[\${timestamp}] REPORTE INTERMEDIO:\\n\`);\nconsole.log(JSON.stringify(payload, null, 2));`;
+            exerciseCode = `// Ejercicio Evaluado: Formateo en Node.js\nconst status = "OK";\nconsole.log(\`Curso 05 Completado - Servidor \${status}\`);`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): String Templates & Buffers (Node.js)\nEmita el mensaje formateado \`Curso 05 Completado - Servidor OK\`.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 5. Formateador String.format - Java ☕\npublic class Main {\n    public static void main(String[] args) {\n        String modulo = "Mensajería Avanzada";\n        int iteraciones = 100;\n        String formatted = String.format("[SYS LOG] %-25s | Iteraciones: %05d", modulo, iteraciones);\n        System.out.println(formatted);\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Formateo de Texto (Java)\npublic class Main {\n    public static void main(String[] args) {\n        System.out.printf("Curso %02d Completado - Java Intermedio%n", 5);\n    }\n}`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Formatters (Java)\nUtiliza System.out.printf() con modificadores de formato e imprime "Curso 05 Completado - Java Intermedio".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 5. Proyecciones Formateadas con CONCAT - SQL 🗄️\nSELECT \n    CONCAT(UPPER('Curso '), '05: ', 'Mensaje Intermedio') AS NombreModulo,\n    RIGHT(CONCAT('000', 42), 4) AS CodigoFormateado;`;
+            exerciseCode = `-- Ejercicio Evaluado: Funciones de Cadena (SQL)\nSELECT CONCAT('Curso 05 Completado', ' - SQL Intermedio') AS resultado;`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Proyecciones String (SQL)\nProyecta la expresión CONCAT e imprime "Curso 05 Completado - SQL Intermedio".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 5. Interpolación con Interfaces - TypeScript 🟦\ninterface LogPayload {\n    courseId: string;\n    level: 'Básico' | 'Intermedio' | 'Avanzado';\n    active: boolean;\n}\n\nconst log: LogPayload = { courseId: "05", level: "Intermedio", active: true };\nconsole.log(\`[TS-LOG] Curso \${log.courseId} - Nivel: \${log.level} | Estado: \${log.active}\`);`;
+            exerciseCode = `// Ejercicio Evaluado: String Interpolation (TypeScript)\nconst tag: string = "TypeScript Intermedio";\nconsole.log(\`Curso 05 Completado - \${tag}\`);`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Interpolación Tipada (TypeScript)\nDeclara una constante tipada e imprime \`Curso 05 Completado - TypeScript Intermedio\`.`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 5. Concatenación e Eventos - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract MessageFormatter {\n    event LogMessage(string indexed category, string details);\n\n    function emitirReporte(string memory usuario) public {\n        emit LogMessage("INTERMEDIO", string(abi.encodePacked("Curso 05 - Usuario: ", usuario)));\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract MessageExercise {\n    string public status = "Curso 05 Completado - Solidity Intermedio";\n}`;
+            prompt = `📌 DESAFÍO 05 (Intermedio): Formateo y Eventos (Solidity)\nDefine un Smart Contract que almacene en estado la cadena "Curso 05 Completado - Solidity Intermedio".`;
+        }
+    }
+    // 6. Variables y Tipo de Datos (Intermedio) - Curso 06
+    else if (cid === 'p2-06' || num === 6) {
+        if (lang === 'python') {
+            exampleCode = `# 6. Casting y Mutabilidad - Python 🐍\nstr_val = "1050"\nnum_int = int(str_val)\nnum_float = float(num_int)\n\n# Tuplas (inmutables) vs Listas (mutables)\ntupla_config = ("localhost", 8080)\nlista_datos = [num_int, num_float]\nlista_datos.append(2000)\n\nprint(f"Parseado: {num_int} | Host: {tupla_config[0]}:{tupla_config[1]} | Lista: {lista_datos}")`;
+            exerciseCode = `# Ejercicio Evaluado: Casting e Inmutabilidad (Python)\nval_str = "2026"\nval_num = int(val_str)\nprint(f"Curso 06 Completado - Año: {val_num}")`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Casting y Tipos Compuestos (Python)\nRealiza la conversión de la cadena "2026" a entero e imprime "Curso 06 Completado - Año: 2026".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 6. Static Cast y Referencias - C++ ⚙️\n#include <iostream>\n#include <string>\n\nint main() {\n    double pi = 3.14159;\n    int entero = static_cast<int>(pi);\n    const std::string tag = "C++ Intermedio";\n    \n    std::cout << "Original: " << pi << " | Casted: " << entero << " | Tag: " << tag << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Static Cast (C++)\n#include <iostream>\n#include <string>\n\nint main() {\n    const std::string langTag = "C++";\n    int code = static_cast<int>(6.0);\n    std::cout << "Curso 0" << code << " Completado - " << langTag << " Intermedio" << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Conversión Explícita (C++)\nAplica static_cast<int> e imprime "Curso 06 Completado - C++ Intermedio".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 6. Inmutabilidad, Mutabilidad y Shadowing - Rust 🦀\nfn main() {\n    let val: &str = "100";\n    let val: i32 = val.parse().unwrap(); // Shadowing\n    let mut total: i32 = val;\n    total += 500;\n    println!("Parseado y Mutado: {}", total);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Variable Shadowing (Rust)\nfn main() {\n    let curso = "6";\n    let curso: i32 = curso.parse().unwrap();\n    println!("Curso 0{} Completado - Rust Intermedio", curso);\n}`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Shadowing y Parsing (Rust)\nRealiza parseo de cadena a entero con shadowing e imprime "Curso 06 Completado - Rust Intermedio".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 6. Conversiones, BigInt y Scope - Node.js 🟢\nconst rawInput = "9007199254740991";\nconst bigNum = BigInt(rawInput);\nconst parsedInt = Number.parseInt("2026", 10);\n\nconst configuracion = Object.freeze({ ambiente: "production", maxConnections: 100 });\nconsole.log(\`BigInt: \${bigNum}n | Year: \${parsedInt} | Env: \${configuracion.ambiente}\`);`;
+            exerciseCode = `// Ejercicio Evaluado: Parsing (Node.js)\nconst anio = Number.parseInt("2026", 10);\nconsole.log(\`Curso 06 Completado - \${anio}\`);`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Casting & Freeze (Node.js)\nParse el número 2026 usando Number.parseInt e imprime \`Curso 06 Completado - 2026\`.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 6. Wrapper Classes y Autoboxing - Java ☕\npublic class Main {\n    public static void main(String[] args) {\n        String strNum = "5000";\n        Integer numWrapper = Integer.parseInt(strNum);\n        final double TASA_IVA = 0.16;\n        double total = numWrapper * (1 + TASA_IVA);\n        System.out.println("Integer Wrapper: " + numWrapper + " | Total con IVA: " + total);\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Integer Parsing (Java)\npublic class Main {\n    public static void main(String[] args) {\n        int anio = Integer.parseInt("2026");\n        System.out.println("Curso 06 Completado - " + anio);\n    }\n}`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Wrappers (Java)\nUtiliza Integer.parseInt() para convertir la cadena e imprime "Curso 06 Completado - 2026".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 6. CAST, CONVERT y Declaración de Tipos - SQL 🗄️\nDECLARE @montoDecimal DECIMAL(10, 2) = 1250.75;\nDECLARE @montoEntero INT = CAST(@montoDecimal AS INT);\n\nSELECT \n    @montoDecimal AS DecimalOriginal,\n    @montoEntero AS CastEntero,\n    CAST('2026-01-01' AS DATE) AS FechaConvertida;`;
+            exerciseCode = `-- Ejercicio Evaluado: CAST (SQL)\nSELECT CONCAT('Curso 06 Completado - ', CAST(2026 AS VARCHAR)) AS resultado;`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Conversiones CAST (SQL)\nRealiza CAST del entero 2026 a VARCHAR y proyecta "Curso 06 Completado - 2026".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 6. Union Types y Type Aliases - TypeScript 🟦\ntype ID = string | number;\ntype Role = 'ADMIN' | 'USER' | 'GUEST';\n\nconst userId: ID = "USR-9921";\nconst userRole: Role = "ADMIN";\nconst readOnlyConfig: readonly number[] = [10, 20, 30];\n\nconsole.log(\`User: \${userId} | Role: \${userRole} | Config: \${readOnlyConfig.join('-')}\`);`;
+            exerciseCode = `// Ejercicio Evaluado: Union Types (TypeScript)\ntype Status = 'Completado' | 'Pendiente';\nconst estado: Status = 'Completado';\nconsole.log(\`Curso 06 \${estado} - TS Intermedio\`);`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Aliases y Uniones (TypeScript)\nDefine un tipo alias union e imprime "Curso 06 Completado - TS Intermedio".`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 6. Memory vs Storage vs Calldata - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract DataLocations {\n    struct Usuario {\n        string nombre;\n        uint256 nivel;\n    }\n    \n    Usuario public usuarioGlobal = Usuario("Carlos", 5);\n    \n    function actualizarMemoria(string calldata nuevoNombre) public pure returns (string memory) {\n        string memory temp = nuevoNombre;\n        return temp;\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract DataExercise {\n    uint256 public constant ANIO = 2026;\n    string public status = "Curso 06 Completado - 2026";\n}`;
+            prompt = `📌 DESAFÍO 06 (Intermedio): Data Locations (Solidity)\nDefine constante ANIO = 2026 y variable pública status con "Curso 06 Completado - 2026".`;
+        }
+    }
+    // 7. Condiciones y Bucles (Intermedio) - Curso 07
+    else if (cid === 'p2-07' || num === 7) {
+        if (lang === 'python') {
+            exampleCode = `# 7. Bucle While con Acumulador y Operador Ternario - Python 🐍\nlimite = 5\ncontador = 1\nsuma_acumulada = 0\n\nwhile contador <= limite:\n    suma_acumulada += contador\n    estado = "Par" if contador % 2 == 0 else "Impar"\n    print(f"Iteracion {contador}: Acumulado = {suma_acumulada} ({estado})")\n    contador += 1\n\nprint(f"Suma Total: {suma_acumulada}")`;
+            exerciseCode = `# Ejercicio Evaluado: Bucle While Acumulador (Python)\ni = 1\nacumulador = 0\nwhile i <= 3:\n    acumulador += i\n    i += 1\nif acumulador == 6:\n    print("Curso 07 Completado - Acumulado: 6")`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Bucles While y Acumuladores (Python)\nSuma los números del 1 al 3 usando while e imprime "Curso 07 Completado - Acumulado: 6".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 7. Switch-Case y Bucle Do-While - C++ ⚙️\n#include <iostream>\n\nint main() {\n    int opcion = 2;\n    switch(opcion) {\n        case 1: std::cout << "Opcion 1" << std::endl; break;\n        case 2: std::cout << "Opcion 2: Seleccionada" << std::endl; break;\n        default: std::cout << "Default" << std::endl;\n    }\n    \n    int contador = 1;\n    do {\n        std::cout << "Do-While ciclo #" << contador << std::endl;\n        contador++;\n    } while(contador <= 2);\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Do-While (C++)\n#include <iostream>\n\nint main() {\n    int count = 1;\n    do {\n        count++;\n    } while(count <= 3);\n    std::cout << "Curso 07 Completado - Iteraciones: 3" << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Control de Selección Múltiple (C++)\nImplementa un ciclo do-while e imprime "Curso 07 Completado - Iteraciones: 3".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 7. Pattern Matching (match) y loop - Rust 🦀\nfn main() {\n    let nota = 88;\n    let clasificacion = match nota {\n        90..=100 => "Excelente",\n        80..=89 => "Notable",\n        70..=79 => "Aprobado",\n        _ => "Reprobado",\n    };\n    println!("Nota: {} | Clasificación: {}", nota, clasificacion);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Pattern Matching (Rust)\nfn main() {\n    let code = 7;\n    let msg = match code {\n        7 => "Curso 07 Completado",\n        _ => "Incompleto",\n    };\n    println!("{}", msg);\n}`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Pattern Matching (Rust)\nEvalúa la variable code con match e imprime "Curso 07 Completado".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 7. Switch, Ternario y Control while - Node.js 🟢\nconst rol = "ADMIN";\nconst acceso = rol === "ADMIN" ? "Concedido Total" : "Limitado";\n\nlet retries = 0;\nwhile (retries < 3) {\n    retries++;\n    process.stdout.write(\`Intento \${retries} de reconexión...\\n\`);\n}\nconsole.log(\`Acceso: \${acceso}\`);`;
+            exerciseCode = `// Ejercicio Evaluado: Switch (Node.js)\nconst level = 7;\nswitch(level) {\n    case 7: console.log("Curso 07 Completado - Node Intermedio"); break;\n}`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Switch y Ternarios (Node.js)\nUtiliza una sentencia switch evaluando 7 e imprime "Curso 07 Completado - Node Intermedio".`;
+        } else if (lang === 'java') {
+            exampleCode = `// 7. Switch Expression y While Loop - Java ☕\npublic class Main {\n    public static void main(String[] args) {\n        int codigoEstado = 200;\n        String respuesta = switch (codigoEstado) {\n            case 200 -> "OK - Exito";\n            case 404 -> "Not Found";\n            default -> "Unknown";\n        };\n        System.out.println("Respuesta Servidor: " + respuesta);\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Switch Expression (Java)\npublic class Main {\n    public static void main(String[] args) {\n        int curso = 7;\n        if (curso == 7) {\n            System.out.println("Curso 07 Completado - Java Intermedio");\n        }\n    }\n}`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Evaluaciones Java (Java)\nVerifica la condición de curso e imprime "Curso 07 Completado - Java Intermedio".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 7. CASE WHEN Condicional y Bucle WHILE en T-SQL - SQL 🗄️\nDECLARE @contador INT = 1;\nWHILE @contador <= 3\nBEGIN\n    SELECT \n        @contador AS Iteracion,\n        CASE WHEN @contador % 2 = 0 THEN 'PAR' ELSE 'IMPAR' END AS Tipo;\n    SET @contador = @contador + 1;\nEND;`;
+            exerciseCode = `-- Ejercicio Evaluado: CASE WHEN (SQL)\nSELECT CASE WHEN 7 = 7 THEN 'Curso 07 Completado' END AS resultado;`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): CASE WHEN Condicional (SQL)\nUtiliza una cláusula CASE WHEN para proyectar "Curso 07 Completado".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 7. Discriminated Union y Typed Control Flow - TypeScript 🟦\ntype Shape = \n  | { kind: "circle"; radius: number }\n  | { kind: "square"; side: number };\n\nfunction getArea(shape: Shape): number {\n  switch (shape.kind) {\n    case "circle": return Math.PI * shape.radius ** 2;\n    case "square": return shape.side ** 2;\n  }\n}\nconsole.log(\`Área Círculo: \${getArea({ kind: "circle", radius: 5 }).toFixed(2)}\`);`;
+            exerciseCode = `// Ejercicio Evaluado: Discriminated Switch (TypeScript)\nconst curso: number = 7;\nconst msg: string = curso === 7 ? "Curso 07 Completado" : "Error";\nconsole.log(msg);`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Ternario Tipado (TypeScript)\nEvalúa el condicional ternario e imprime "Curso 07 Completado".`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 7. Require, Revert y Iteración de Arrays - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract ControlFlowAdvanced {\n    uint256[] public numeros = [10, 20, 30, 40];\n    \n    function sumarArray() public view returns (uint256 total) {\n        require(numeros.length > 0, "Array vacio");\n        for (uint256 i = 0; i < numeros.length; i++) {\n            total += numeros[i];\n        }\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract FlowExercise {\n    function verificar(uint256 x) public pure returns (string memory) {\n        require(x == 7, "Valor invalido");\n        return "Curso 07 Completado";\n    }\n}`;
+            prompt = `📌 DESAFÍO 07 (Intermedio): Require y Validación (Solidity)\nDefine la función verificar(7) que use require y devuelva "Curso 07 Completado".`;
+        }
+    }
+    // 8. Funciones, consultas y metodos (Intermedio) - Curso 08
+    else if (cid === 'p2-08' || num === 8) {
+        if (lang === 'python') {
+            exampleCode = `# 8. Funciones Lambda, Default Args y Kwargs - Python 🐍\ndef crear_perfil(nombre, rol="Estudiante", *habilidades, **metadata):\n    print(f"Usuario: {nombre} | Rol: {rol}")\n    print(f"Habilidades: {list(habilidades)}")\n    print(f"Meta: {metadata}")\n\ncrear_perfil("Carlos", "Developer", "Python", "SQL", activo=True, nivel="Intermedio")`;
+            exerciseCode = `# Ejercicio Evaluado: Lambda & Kwargs (Python)\ncalcular_modulo = lambda n: f"Curso {n:02d} Completado"\nprint(calcular_modulo(8))`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Lambda Functions (Python)\nDefine una función lambda que reciba el número 8 y retorne "Curso 08 Completado".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 8. Sobrecarga de Funciones y Parámetros por Referencia - C++ ⚙️\n#include <iostream>\n#include <string>\n\nvoid duplicarValor(int &numero) {\n    numero *= 2;\n}\n\nstd::string formatear(std::string msg) {\n    return "[INFO] " + msg;\n}\n\nint main() {\n    int val = 25;\n    duplicarValor(val);\n    std::cout << formatear("Valor duplicado: " + std::to_string(val)) << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Referencias & Overloading (C++)\n#include <iostream>\n#include <string>\n\nvoid completarCurso(std::string &status) {\n    status = "Curso 08 Completado";\n}\n\nint main() {\n    std::string s = "";\n    completarCurso(s);\n    std::cout << s << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Paso por Referencia (C++)\nModifica una variable string por referencia (&) asignándole e imprimiendo "Curso 08 Completado".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 8. Referencias Mutables, Closures y Result - Rust 🦀\nfn procesar_dato(val: &mut i32) -> Result<i32, &'static str> {\n    if *val < 0 {\n        return Err("Valor negativo");\n    }\n    *val *= 10;\n    Ok(*val)\n}\n\nfn main() {\n    let mut numero = 5;\n    let closure_suma = |a: i32, b: i32| a + b;\n    println!("Closure Suma: {}", closure_suma(10, 20));\n    let _ = procesar_dato(&mut numero);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Closures (Rust)\nfn main() {\n    let obtener_msg = |c: i32| format!("Curso 0{} Completado", c);\n    println!("{}", obtener_msg(8));\n}`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Closures en Rust (Rust)\nDefine una closure en Rust que reciba 8 y formatee "Curso 08 Completado".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 8. Arrow Functions, Rest Parameters y Callbacks - Node.js 🟢\nconst procesarItems = (multiplicador, ...items) => {\n    return items.map(item => item * multiplicador);\n};\n\nconst ejecutarAsincrono = (callback) => {\n    const data = procesarItems(2, 10, 20, 30);\n    callback(data);\n};\n\nejecutarAsincrono(resultados => console.log("Resultados:", resultados));`;
+            exerciseCode = `// Ejercicio Evaluado: Arrow Functions (Node.js)\nconst getCourseStatus = (code) => \`Curso 0\${code} Completado\`;\nconsole.log(getCourseStatus(8));`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Arrow Functions & Rest Parameters (Node.js)\nCrea una arrow function que reciba 8 y devuelva \`Curso 08 Completado\`.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 8. Sobrecarga de Métodos y Parámetros - Java ☕\npublic class Main {\n    public static int calcular(int a, int b) {\n        return a + b;\n    }\n    public static double calcular(double a, double b) {\n        return a * b;\n    }\n\n    public static void main(String[] args) {\n        System.out.println("Suma Enteros: " + calcular(10, 20));\n        System.out.println("Prod Doubles: " + calcular(2.5, 4.0));\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Method Overloading (Java)\npublic class Main {\n    public static String getStatus(int c) {\n        return "Curso 0" + c + " Completado";\n    }\n    public static void main(String[] args) {\n        System.out.println(getStatus(8));\n    }\n}`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Sobrecarga de Métodos (Java)\nImplementa el método getStatus(8) que retorne "Curso 08 Completado".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 8. Funciones Agregadas, GROUP BY y HAVING - SQL 🗄️\nSELECT \n    departamento,\n    COUNT(*) AS TotalEmpleados,\n    AVG(salario) AS PromedioSalario\nFROM (\n    SELECT 'IT' AS departamento, 3500 AS salario\n    UNION ALL\n    SELECT 'IT', 4500\n    UNION ALL\n    SELECT 'Ventas', 2800\n) AS Datos\nGROUP BY departamento\nHAVING AVG(salario) > 3000;`;
+            exerciseCode = `-- Ejercicio Evaluado: Agregaciones (SQL)\nSELECT COUNT(*) AS total, 'Curso 08 Completado' AS status\nFROM (SELECT 1 AS x UNION ALL SELECT 2) t;`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Subconsultas y Agregaciones (SQL)\nRealiza una agregación COUNT(*) y proyecta "Curso 08 Completado".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 8. Generics Básicos y Method Signatures - TypeScript 🟦\nfunction envolverEnRespuesta<T>(datos: T, status: number = 200) {\n    return {\n        timestamp: new Date(),\n        status,\n        datos\n    };\n}\n\nconst respString = envolverEnRespuesta<string>("Payload de prueba");\nconst respNum = envolverEnRespuesta<number>(404);\nconsole.log(respString.datos, "| Status:", respNum.status);`;
+            exerciseCode = `// Ejercicio Evaluado: Generic Function (TypeScript)\nfunction getInfo<T>(val: T): string {\n    return \`Curso \${val} Completado\`;\n}\nconsole.log(getInfo<string>("08"));`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Funciones Genéricas (TypeScript)\nCrea una función genérica getInfo<T> que reciba "08" y devuelva \`Curso 08 Completado\`.`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 8. Retorno Múltiple de Tuplas y Modificadores - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract AdvancedFunctions {\n    address public owner;\n    \n    constructor() {\n        owner = msg.sender;\n    }\n    \n    modifier onlyOwner() {\n        require(msg.sender == owner, "No autorizado");\n        _;\n    }\n    \n    function obtenerEstadisticas() public pure returns (uint256 total, bool activo, string memory tag) {\n        return (100, true, "OK");\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract FunctionsExercise {\n    function getStatus() public pure returns (bool, string memory) {\n        return (true, "Curso 08 Completado");\n    }\n}`;
+            prompt = `📌 DESAFÍO 08 (Intermedio): Retorno de Tuplas (Solidity)\nDefine la función getStatus() que devuelva la tupla (true, "Curso 08 Completado").`;
+        }
+    }
+
+    // =========================================================================
+    // 🟪 NIVEL AVANZADO (Cursos 09 - 12)
+    // =========================================================================
+
+    // 9. Hola Mundo & Mensaje (Avanzado) - Curso 09
+    else if (cid === 'p3-09' || num === 9) {
+        if (lang === 'python') {
+            exampleCode = `# 9. Motor de Logging Estructurado Enterprise - Python 🐍\nimport logging\nimport sys\nimport json\nfrom datetime import datetime\n\nclass JSONFormatter(logging.Formatter):\n    def format(self, record):\n        log_obj = {\n            "timestamp": datetime.utcnow().isoformat(),\n            "level": record.levelname,\n            "message": record.getMessage(),\n            "module": record.module\n        }\n        return json.dumps(log_obj)\n\nlogger = logging.getLogger("EnterpriseApp")\nlogger.setLevel(logging.INFO)\nhandler = logging.StreamHandler(sys.stdout)\nhandler.setFormatter(JSONFormatter())\nlogger.addHandler(handler)\n\nlogger.info("Sistema de Logging Inicializado Correctamente")`;
+            exerciseCode = `# Ejercicio Evaluado: Logging Estructurado (Python)\nimport sys\nsys.stdout.write("[LOG-ENTERPRISE] Curso 09 Completado\\n")`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Motor de Logging e I/O Streams (Python)\nEscribe directamente en sys.stdout la cadena "[LOG-ENTERPRISE] Curso 09 Completado".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 9. Logger Thread-Safe con Overloading de Operators - C++ ⚙️\n#include <iostream>\n#include <string>\n#include <sstream>\n\nenum class LogLevel { INFO, WARNING, ERROR };\n\nclass ThreadLogger {\npublic:\n    static void log(LogLevel level, const std::string& msg) {\n        std::string prefix = (level == LogLevel::INFO) ? "[INFO]" : "[ERROR]";\n        std::cout << prefix << " " << msg << std::endl;\n    }\n};\n\nint main() {\n    ThreadLogger::log(LogLevel::INFO, "Logger avanzado thread-safe inicializado.");\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Custom Logger Class (C++)\n#include <iostream>\n#include <string>\n\nclass CustomLogger {\npublic:\n    static void emit(const std::string& msg) {\n        std::cout << "[ADVANCED-LOG] " << msg << std::endl;\n    }\n};\n\nint main() {\n    CustomLogger::emit("Curso 09 Completado");\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Thread-Safe Logger Engine (C++)\nImplementa CustomLogger::emit() e imprime "[ADVANCED-LOG] Curso 09 Completado".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 9. Macros Personalizadas y Display Trait - Rust 🦀\nuse std::fmt;\n\nstruct SystemLog {\n    level: &'static str,\n    message: String,\n}\n\nimpl fmt::Display for SystemLog {\n    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {\n        write!(f, "[LOG :: {}] {}", self.level, self.message)\n    }\n}\n\nfn main() {\n    let entry = SystemLog { level: "INFO", message: "Motor Rust Iniciado".to_string() };\n    println!("{}", entry);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Custom Macro (Rust)\nmacro_rules! log_advanced {\n    ($msg:expr) => {\n        println!("[RUST-ADVANCED] {}", $msg);\n    };\n}\n\nfn main() {\n    log_advanced!("Curso 09 Completado");\n}`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Declaraciones Macro (Rust)\nCrea la macro log_advanced! e imprime "[RUST-ADVANCED] Curso 09 Completado".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 9. Stream Piping y Event-Driven Logger - Node.js 🟢\nconst EventEmitter = require('events');\n\nclass LoggerService extends EventEmitter {\n    log(level, message) {\n        const payload = { timestamp: Date.now(), level, message };\n        this.emit('log', payload);\n    }\n}\n\nconst logger = new LoggerService();\nlogger.on('log', (data) => {\n    process.stdout.write(\`[\${data.level}] \${data.message} (\${data.timestamp})\\n\`);\n});\nlogger.log("INFO", "Logger asíncrono configurado.");`;
+            exerciseCode = `// Ejercicio Evaluado: Event Logger (Node.js)\nconst EventEmitter = require('events');\nconst ee = new EventEmitter();\nee.on('complete', (msg) => console.log(\`[EVENT-LOG] \${msg}\`));\nee.emit('complete', 'Curso 09 Completado');`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): EventEmitter Logging (Node.js)\nUtiliza EventEmitter para emitir el evento 'complete' con la cadena \`Curso 09 Completado\`.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 9. Enterprise Logger Framework - Java ☕\nimport java.time.Instant;\n\npublic class Main {\n    public static class EnterpriseLogger {\n        public static void log(String level, String message) {\n            String threadName = Thread.currentThread().getName();\n            String timestamp = Instant.now().toString();\n            System.out.printf("[%s] [%s] [%s] %s%n", timestamp, threadName, level, message);\n        }\n    }\n\n    public static void main(String[] args) {\n        EnterpriseLogger.log("INFO", "Sistema de trazabilidad Java activo.");\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Enterprise Logger (Java)\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("[JAVA-ADVANCED-LOG] Curso 09 Completado");\n    }\n}`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Logging Architecture (Java)\nImprime el mensaje estructurado "[JAVA-ADVANCED-LOG] Curso 09 Completado".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 9. Execution Diagnostics con RAISERROR - SQL 🗄️\nDECLARE @ErrorMessage NVARCHAR(4000) = 'Ejecución de diagnóstico de sistema';\nPRINT '[DIAGNOSTICO] ' + @ErrorMessage;\n\nSELECT \n    GETDATE() AS TimestampExecution,\n    @@SPID AS SessionID,\n    'COMPLETADO' AS StatusEngine;`;
+            exerciseCode = `-- Ejercicio Evaluado: Diagnostics (SQL)\nPRINT 'Curso 09 Completado';\nSELECT 'Curso 09 Completado' AS OutputLog;`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Procedimientos de Diagnóstico (SQL)\nEjecuta PRINT 'Curso 09 Completado' y proyecta la columna OutputLog con "Curso 09 Completado".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 9. Generic Context Logger Service - TypeScript 🟦\nenum Severity { DEBUG, INFO, WARN, ERROR }\n\ninterface LogMeta {\n    userId: string;\n    action: string;\n}\n\nclass SystemLogger<T extends LogMeta> {\n    log(level: Severity, message: string, meta: T): void {\n        console.log(\`[\${Severity[level]}] \${message} | User: \${meta.userId} | Action: \${meta.action}\`);\n    }\n}\n\nconst sysLogger = new SystemLogger<LogMeta>();\nsysLogger.log(Severity.INFO, "Acción procesada", { userId: "U-100", action: "UPDATE" });`;
+            exerciseCode = `// Ejercicio Evaluado: Typed System Logger (TypeScript)\nclass TSLogger {\n    static log(msg: string): void {\n        console.log(\`[TS-ADVANCED] \${msg}\`);\n    }\n}\nTSLogger.log("Curso 09 Completado");`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Logger Genérico (TypeScript)\nImplementa TSLogger.log() e imprime \`[TS-ADVANCED] Curso 09 Completado\`.`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 9. Indexed Event Emission Engine - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract AdvancedEventLogger {\n    event AdvancedLog(\n        address indexed sender,\n        uint256 indexed timestamp,\n        string message\n    );\n    \n    function triggerEvent(string memory msgText) public {\n        emit AdvancedLog(msg.sender, block.timestamp, msgText);\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract EventExercise {\n    event Completed(string status);\n    function emitStatus() public {\n        emit Completed("Curso 09 Completado");\n    }\n}`;
+            prompt = `📌 DESAFÍO 09 (Avanzado): Event Emission Indexing (Solidity)\nDefine el evento Completed(string) y la función emitStatus() emitiendo "Curso 09 Completado".`;
+        }
+    }
+    // 10. Variables y Tipo de Datos (Avanzado) - Curso 10
+    else if (cid === 'p3-10' || num === 10) {
+        if (lang === 'python') {
+            exampleCode = `# 10. Memory Optimization con __slots__ y Generic TypeVars - Python 🐍\nfrom typing import TypeVar, Generic\nimport sys\n\nT = TypeVar('T')\n\nclass ContenedorHeap(Generic[T]):\n    __slots__ = ('_data', '_ref_count')\n    def __init__(self, data: T):\n        self._data = data\n        self._ref_count = 1\n        \n    def get_data(self) -> T:\n        return self._data\n\ninstancia = ContenedorHeap[int](2026)\nprint(f"Dato Heap: {instancia.get_data()} | Slots Size: {sys.getsizeof(instancia)} bytes")`;
+            exerciseCode = `# Ejercicio Evaluado: Slots y Memoria (Python)\nclass EstadoOptimizado:\n    __slots__ = ('status',)\n    def __init__(self):\n        self.status = "Curso 10 Completado"\n\ne = EstadoOptimizado()\nprint(e.status)`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Optimización de Memoria __slots__ (Python)\nDefine una clase con __slots__ = ('status',) e imprime "Curso 10 Completado".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 10. Smart Pointers (std::unique_ptr & std::shared_ptr) - C++ ⚙️\n#include <iostream>\n#include <memory>\n#include <string>\n\nclass Resource {\npublic:\n    std::string name;\n    Resource(std::string n) : name(n) { std::cout << "[ALLOC] " << name << std::endl; }\n    ~Resource() { std::cout << "[DEALLOC] " << name << std::endl; }\n};\n\nint main() {\n    std::unique_ptr<Resource> res = std::make_unique<Resource>("HeapObject_2026");\n    std::cout << "Recurso en Heap: " << res->name << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Smart Pointers (C++)\n#include <iostream>\n#include <memory>\n#include <string>\n\nint main() {\n    auto ptr = std::make_unique<std::string>("Curso 10 Completado");\n    std::cout << *ptr << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Asignación Dinámica con unique_ptr (C++)\nCrea un std::unique_ptr<std::string> con "Curso 10 Completado" e imprímelo desreferenciándolo.`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 10. Box<T>, Punteros Heap y Trazabilidad de Lifetimes - Rust 🦀\nstruct HeapWrapper<T> {\n    data: Box<T>,\n}\n\nimpl<T> HeapWrapper<T> {\n    fn new(val: T) -> Self {\n        HeapWrapper { data: Box::new(val) }\n    }\n}\n\nfn main() {\n    let boxed_val = HeapWrapper::new("Dato en Heap Rust");\n    println!("Valor en Box: {}", boxed_val.data);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Box Heap Allocation (Rust)\nfn main() {\n    let heap_data: Box<&str> = Box::new("Curso 10 Completado");\n    println!("{}", heap_data);\n}`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Asignación en Heap con Box<T> (Rust)\nAsigna un Box::new("Curso 10 Completado") e imprímelo en consola.`;
+        } else if (lang === 'node') {
+            exampleCode = `// 10. Buffer API, TypedArrays y ArrayBuffer - Node.js 🟢\nconst buffer = Buffer.alloc(16);\nbuffer.write("DevHub 2026", "utf-8");\n\nconst arrayBuffer = new ArrayBuffer(8);\nconst view = new Int32Array(arrayBuffer);\nview[0] = 2026;\n\nconsole.log("Buffer Text:", buffer.toString("utf-8").trim());\nconsole.log("TypedArray Int32:", view[0]);`;
+            exerciseCode = `// Ejercicio Evaluado: Buffer Allocation (Node.js)\nconst buf = Buffer.from("Curso 10 Completado");\nconsole.log(buf.toString("utf-8"));`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Manipulación Binaria con Buffer (Node.js)\nCrea un Buffer.from("Curso 10 Completado") e imprímelo en formato utf-8.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 10. Java Generics y Collections Framework - Java ☕\nimport java.util.Map;\nimport java.util.HashMap;\n\npublic class Main {\n    public static class StorageEngine<K, V> {\n        private Map<K, V> map = new HashMap<>();\n        public void put(K key, V val) { map.put(key, val); }\n        public V get(K key) { return map.get(key); }\n    }\n\n    public static void main(String[] args) {\n        StorageEngine<String, Integer> engine = new StorageEngine<>();\n        engine.put("Year", 2026);\n        System.out.println("Storage Engine Heap Value: " + engine.get("Year"));\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Generics (Java)\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> list = new ArrayList<>();\n        list.add("Curso 10 Completado");\n        System.out.println(list.get(0));\n    }\n}`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Estructuras de Memoria Genéricas (Java)\nUtiliza List<String> para agregar y recuperar "Curso 10 Completado".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 10. Manipulación de Objetos JSON en Columnas - SQL 🗄️\nDECLARE @jsonPayload NVARCHAR(MAX) = N'{"curso":{"id":10,"name":"Variables Avanzadas","status":"OK"}}';\n\nSELECT \n    JSON_VALUE(@jsonPayload, '$.curso.id') AS CursoID,\n    JSON_VALUE(@jsonPayload, '$.curso.name') AS CursoNombre,\n    JSON_VALUE(@jsonPayload, '$.curso.status') AS Estado;`;
+            exerciseCode = `-- Ejercicio Evaluado: JSON Extraction (SQL)\nSELECT JSON_VALUE('{"msg":"Curso 10 Completado"}', '$.msg') AS resultado;`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Parseo de Objetos JSON (SQL)\nUtiliza JSON_VALUE para extraer y proyectar "Curso 10 Completado".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 10. Mapped Types y Utility Types - TypeScript 🟦\ninterface UserProfile {\n    id: number;\n    username: string;\n    email: string;\n}\n\ntype ReadonlyProfile = Readonly<UserProfile>;\ntype PartialProfile = Partial<UserProfile>;\n\nconst user: ReadonlyProfile = { id: 10, username: "DevMaster", email: "master@fp.edu" };\nconsole.log(\`Profile ID: \${user.id} | User: \${user.username}\`);`;
+            exerciseCode = `// Ejercicio Evaluado: Utility Types (TypeScript)\ntype Payload<T> = Readonly<{ data: T }>;\nconst res: Payload<string> = { data: "Curso 10 Completado" };\nconsole.log(res.data);`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Mapped & Utility Types (TypeScript)\nDefine el tipo Readonly Payload<T> e imprime \`Curso 10 Completado\`.`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 10. Optimized Storage Layout y Nested Struct Mappings - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract AdvancedStorage {\n    struct Item {\n        uint128 id;    // Packed in slot\n        uint128 price;\n        string name;\n    }\n    \n    mapping(address => mapping(uint256 => Item)) public userItems;\n    \n    function setItem(uint256 index, uint128 price, string memory name) public {\n        userItems[msg.sender][index] = Item(uint128(index), price, name);\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract StorageExercise {\n    struct Status { string text; }\n    mapping(uint256 => Status) public statuses;\n    constructor() {\n        statuses[10] = Status("Curso 10 Completado");\n    }\n}`;
+            prompt = `📌 DESAFÍO 10 (Avanzado): Struct Mappings (Solidity)\nCrea un mapping de structs e inicializa statuses[10] con "Curso 10 Completado".`;
+        }
+    }
+    // 11. Condiciones y Bucles (Avanzado) - Curso 11
+    else if (cid === 'p3-11' || num === 11) {
+        if (lang === 'python') {
+            exampleCode = `# 11. Guard Clauses, List Comprehensions y Generators - Python 🐍\ndef procesar_transaccion(monto: float, activo: bool) -> str:\n    # Guard Clauses (Early Return)\n    if not activo: return "Error: Cuenta Inactiva"\n    if monto <= 0: return "Error: Monto Invalido"\n    \n    return f"Transaccion Aprobada: USD {monto}"\n\n# Generator Expression\nnumeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\npares_cuadrados = [x**2 for x in numeros if x % 2 == 0]\n\nprint(procesar_transaccion(150.0, True))\nprint(f"Pares Cuadrados: {pares_cuadrados}")`;
+            exerciseCode = `# Ejercicio Evaluado: Guard Clauses (Python)\ndef validar_curso(nivel):\n    if nivel != 11: return "Invalido"\n    return "Curso 11 Completado"\n\nprint(validar_curso(11))`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Cláusulas de Guarda / Early Return (Python)\nImplementa una guard clause que retorne "Curso 11 Completado" cuando el argumento sea 11.`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 11. Predicados Lambda con Algoritmos STL - C++ ⚙️\n#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    std::vector<int> datos = {10, 25, 40, 55, 70, 85};\n    \n    // Algoritmo STL con predicado Lambda\n    auto it = std::find_if(datos.begin(), datos.end(), [](int val) {\n        return val > 50 && val % 2 == 0;\n    });\n    \n    if (it != datos.end()) {\n        std::cout << "Primer par > 50 encontrado: " << *it << std::endl;\n    }\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: STL Predicate (C++)\n#include <iostream>\n#include <vector>\n#include <algorithm>\n\nint main() {\n    std::vector<int> v = {11};\n    bool allMatch = std::all_of(v.begin(), v.end(), [](int n){ return n == 11; });\n    if (allMatch) std::cout << "Curso 11 Completado" << std::endl;\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Predicados Lambda STL (C++)\nUtiliza std::all_of con una lambda e imprime "Curso 11 Completado".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 11. Tubos Iteradores (Pipelines) e if-let Pattern - Rust 🦀\nfn main() {\n    let numeros = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n    \n    // Iterator Pipeline: filter -> map -> collect\n    let resultado: Vec<i32> = numeros.into_iter()\n        .filter(|x| x % 2 == 0)\n        .map(|x| x * 10)\n        .collect();\n        \n    println!("Pipeline Processed: {:?}", resultado);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Iterator Pipeline (Rust)\nfn main() {\n    let nums = vec![11];\n    let res: Vec<String> = nums.into_iter()\n        .filter(|n| *n == 11)\n        .map(|_| "Curso 11 Completado".to_string())\n        .collect();\n    println!("{}", res[0]);\n}`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Pipings de Iteradores (Rust)\nFiltra y mapea un vector usando iteradores en Rust e imprime "Curso 11 Completado".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 11. Early Returns, Generator Functions y Array Filters - Node.js 🟢\nfunction* generadorId() {\n    let id = 100;\n    while (true) {\n        yield id++;\n    }\n}\n\nconst gen = generadorId();\nconst datos = [10, 15, 20, 25, 30];\nconst paresFiltrados = datos.filter(x => x % 2 === 0).map(x => x * 2);\n\nconsole.log("ID Gen:", gen.next().value, "| Pares Filtrados:", paresFiltrados);`;
+            exerciseCode = `// Ejercicio Evaluado: Generator Function (Node.js)\nfunction* cursoGenerator() {\n    yield "Curso 11 Completado";\n}\nconst g = cursoGenerator();\nconsole.log(g.next().value);`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Funciones Generadoras (Node.js)\nCrea una función generadora function* que emita \`Curso 11 Completado\`.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 11. Stream API Filtering Pipeline - Java ☕\nimport java.util.List;\nimport java.util.Arrays;\nimport java.util.stream.Collectors;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);\n        List<Integer> paresAlCuadrado = numeros.stream()\n            .filter(n -> n % 2 == 0)\n            .map(n -> n * n)\n            .collect(Collectors.toList());\n            \n        System.out.println("Stream Filtered: " + paresAlCuadrado);\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Stream API (Java)\nimport java.util.Arrays;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> list = Arrays.asList(11);\n        list.stream().filter(n -> n == 11).forEach(n -> System.out.println("Curso 11 Completado"));\n    }\n}`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Streams Pipeline (Java)\nFiltra una lista con el Stream API e imprime "Curso 11 Completado".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 11. Window Functions (ROW_NUMBER) y CTEs - SQL 🗄️\nWITH VentaRankings AS (\n    SELECT \n        'Vendedor A' AS Vendedor, 5000 AS TotalVentas\n    UNION ALL\n    SELECT 'Vendedor B', 7500\n    UNION ALL\n    SELECT 'Vendedor C', 3200\n)\nSELECT \n    Vendedor,\n    TotalVentas,\n    ROW_NUMBER() OVER (ORDER BY TotalVentas DESC) AS RankingPosicion\nFROM VentaRankings;`;
+            exerciseCode = `-- Ejercicio Evaluado: CTE (SQL)\nWITH StatusCTE AS (\n    SELECT 'Curso 11 Completado' AS StatusMsg\n)\nSELECT StatusMsg FROM StatusCTE;`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Common Table Expressions CTE (SQL)\nCrea una CTE llamada StatusCTE e imprime "Curso 11 Completado".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 11. User-Defined Type Guards - TypeScript 🟦\ninterface AdminUser { role: 'admin'; permissions: string[]; }\ninterface BasicUser { role: 'basic'; name: string; }\ntype User = AdminUser | BasicUser;\n\nfunction isAdmin(user: User): user is AdminUser {\n    return user.role === 'admin';\n}\n\nconst u: User = { role: 'admin', permissions: ['ALL'] };\nif (isAdmin(u)) {\n    console.log(\`Admin detectado con permisos: \${u.permissions.join(', ')}\`);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Type Guard (TypeScript)\nfunction checkLevel(val: any): val is number {\n    return typeof val === 'number';\n}\nif (checkLevel(11)) console.log("Curso 11 Completado");`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Guardas de Tipo Personalizadas (TypeScript)\nDefine una guarda de tipo checkLevel e imprime \`Curso 11 Completado\`.`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 11. Custom Revert Errors y Guard Clauses - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract CustomErrorGuard {\n    error Unauthorized(address caller);\n    error InvalidAmount(uint256 amount);\n    \n    address public owner = msg.sender;\n    \n    function withdraw(uint256 amount) public {\n        if (msg.sender != owner) revert Unauthorized(msg.sender);\n        if (amount == 0) revert InvalidAmount(amount);\n    }\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract ErrorExercise {\n    error CourseError();\n    function checkCourse(uint256 c) public pure returns (string memory) {\n        if (c != 11) revert CourseError();\n        return "Curso 11 Completado";\n    }\n}`;
+            prompt = `📌 DESAFÍO 11 (Avanzado): Errores Personalizados Revert (Solidity)\nDefine un custom error CourseError() y retorne "Curso 11 Completado" si c es 11.`;
+        }
+    }
+    // 12. Funciones, consultas y metodos (Avanzado) - Curso 12
+    else if (cid === 'p3-12' || num === 12) {
+        if (lang === 'python') {
+            exampleCode = `# 12. Decoradores, Memoización y Higher-Order Functions - Python 🐍\nimport functools\nimport time\n\ndef medir_tiempo(func):\n    @functools.wraps(func)\n    def wrapper(*args, **kwargs):\n        inicio = time.time()\n        resultado = func(*args, **kwargs)\n        duracion = time.time() - inicio\n        print(f"[METRICA] Func {func.__name__} tomo {duracion:.6f}s")\n        return resultado\n    return wrapper\n\n@functools.lru_cache(maxsize=32)\n@medir_tiempo\ndef fibonacci(n):\n    if n <= 1: return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n\nprint(f"Fibonacci(10) = {fibonacci(10)}")`;
+            exerciseCode = `# Ejercicio Evaluado: Decoradores (Python)\ndef decorador_curso(func):\n    def wrapper():\n        return f"Curso {func()} Completado"\n    return wrapper\n\n@decorador_curso\ndef obtener_num(): return 12\n\nprint(obtener_num())`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Decoradores de Funciones (Python)\nCrea un decorador que transforme la función e imprima "Curso 12 Completado".`;
+        } else if (lang === 'cpp') {
+            exampleCode = `// 12. Variadic Templates y Callbacks Lambda - C++ ⚙️\n#include <iostream>\n#include <functional>\n\ntemplate<typename T>\nT sumar(T val) {\n    return val;\n}\n\ntemplate<typename T, typename... Args>\nT sumar(T first, Args... args) {\n    return first + sumar(args...);\n}\n\nint main() {\n    std::cout << "Suma Variádica: " << sumar(10, 20, 30, 40) << std::endl;\n    return 0;\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Variadic Function (C++)\n#include <iostream>\n#include <string>\n\ntemplate<typename... Args>\nvoid printAdvancedLog(Args... args) {\n    (std::cout << ... << args) << std::endl;\n}\n\nint main() {\n    printAdvancedLog("Curso ", 12, " Completado");\n    return 0;\n}`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Variadic Templates (C++)\nImplementa una función variádica e imprime "Curso 12 Completado".`;
+        } else if (lang === 'rust') {
+            exampleCode = `// 12. High-Order Trait Bounds (Fn, FnMut, FnOnce) - Rust 🦀\nfn aplicar_operacion<F>(val: i32, op: F) -> i32 \nwhere\n    F: Fn(i32) -> i32,\n{\n    op(val)\n}\n\nfn main() {\n    let duplicar = |x: i32| x * 2;\n    let resultado = aplicar_operacion(21, duplicar);\n    println!("Resultado High-Order: {}", resultado);\n}`;
+            exerciseCode = `// Ejercicio Evaluado: High-Order Fn Trait (Rust)\nfn ejecutar_closure<F>(f: F)\nwhere F: Fn() -> &'static str {\n    println!("{}", f());\n}\n\nfn main() {\n    ejecutar_closure(|| "Curso 12 Completado");\n}`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Higher-Order Closures (Rust)\nPasa una closure como parámetro con trait bound Fn() e imprime "Curso 12 Completado".`;
+        } else if (lang === 'node') {
+            exampleCode = `// 12. Function Currying y High-Order Wrappers - Node.js 🟢\nconst curriedSum = a => b => c => a + b + c;\nconst asyncWrapper = fn => async (...args) => {\n    try {\n        return await fn(...args);\n    } catch (err) {\n        console.error("Error atrapado:", err.message);\n    }\n};\n\nconst operacion = async (x) => x * 10;\nconst operacionSegura = asyncWrapper(operacion);\noperacionSegura(5).then(res => console.log("Currying & Async Wrapper:", curriedSum(1)(2)(3), "| Res:", res));`;
+            exerciseCode = `// Ejercicio Evaluado: Function Currying (Node.js)\nconst compose = f => g => x => f(g(x));\nconst addCode = x => \`Curso \${x}\`;\nconst addDone = str => \`\${str} Completado\`;\nconsole.log(compose(addDone)(addCode)(12));`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Composición de Funciones (Node.js)\nImplementa función de composición curried que imprima \`Curso 12 Completado\`.`;
+        } else if (lang === 'java') {
+            exampleCode = `// 12. Functional Interfaces y Stream Reduction - Java ☕\nimport java.util.function.Function;\nimport java.util.function.Predicate;\n\npublic class Main {\n    public static void main(String[] args) {\n        Function<String, String> addPrefix = s -> "[FUNC] " + s;\n        Function<String, String> addSuffix = s -> s + " [OK]";\n        Function<String, String> pipeline = addPrefix.andThen(addSuffix);\n        \n        System.out.println(pipeline.apply("Modulo Avanzado Procesado"));\n    }\n}`;
+            exerciseCode = `// Ejercicio Evaluado: Functional Interface (Java)\nimport java.util.function.Function;\n\npublic class Main {\n    public static void main(String[] args) {\n        Function<Integer, String> mapper = c -> "Curso " + c + " Completado";\n        System.out.println(mapper.apply(12));\n    }\n}`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Functional Interfaces (Java)\nUtiliza Function<Integer, String> para mapear 12 a "Curso 12 Completado".`;
+        } else if (lang === 'sql') {
+            exampleCode = `-- 12. Stored Procedures con Transacciones ACID - SQL 🗄️\nCREATE PROCEDURE sp_ProcesarTransaccion\n    @Monto DECIMAL(10,2)\nAS\nBEGIN\n    BEGIN TRANSACTION;\n    BEGIN TRY\n        PRINT 'Iniciando Transaccion...';\n        COMMIT TRANSACTION;\n        SELECT 'Curso 12 Completado' AS StatusTransaccion;\n    END TRY\n    BEGIN CATCH\n        ROLLBACK TRANSACTION;\n        PRINT 'Error detectado. Rollback ejecutado.';\n    END CATCH\nEND;\n\nEXEC sp_ProcesarTransaccion @Monto = 100.00;`;
+            exerciseCode = `-- Ejercicio Evaluado: Stored Procedure (SQL)\nCREATE PROCEDURE sp_TestStatus AS\nBEGIN\n    SELECT 'Curso 12 Completado' AS resultado;\nEND;\nEXEC sp_TestStatus;`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Transacciones y Stored Procedures (SQL)\nEjecuta un Stored Procedure que proyecte "Curso 12 Completado".`;
+        } else if (lang === 'typescript') {
+            exampleCode = `// 12. Advanced Generic High-Order Composition - TypeScript 🟦\ntype Func<T, R> = (arg: T) => R;\n\nfunction compose<A, B, C>(f: Func<B, C>, g: Func<A, B>): Func<A, C> {\n    return (x: A) => f(g(x));\n}\n\nconst step1: Func<number, string> = (n) => \`Curso \${n}\`;\nconst step2: Func<string, string> = (s) => \`\${s} Completado\`;\nconst combined = compose(step2, step1);\n\nconsole.log(combined(12));`;
+            exerciseCode = `// Ejercicio Evaluado: Generic Composition (TypeScript)\ntype Mapper<T> = (val: T) => string;\nconst executeMapper = <T>(val: T, fn: Mapper<T>): string => fn(val);\nconsole.log(executeMapper(12, n => \`Curso \${n} Completado\`));`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Composición Genérica (TypeScript)\nEjecuta la composición genérica enviando 12 para imprimir \`Curso 12 Completado\`.`;
+        } else if (lang === 'solidity') {
+            exampleCode = `// SPDX-License-Identifier: MIT\n// 12. Pure vs View, Assembly & Low-Level Calls - Solidity ⛓️\npragma solidity ^0.8.0;\n\ncontract AdvancedContract {\n    uint256 public counter = 100;\n    \n    function pureCalculation(uint256 a, uint256 b) public pure returns (uint256) {\n        return a * b + 12;\n    }\n    \n    function viewState() public view returns (uint256) {\n        return counter;\n    }\n    \n    fallback() external payable {}\n    receive() external payable {}\n}`;
+            exerciseCode = `// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\ncontract FinalExercise {\n    function getFinalStatus() public pure returns (string memory) {\n        return "Curso 12 Completado";\n    }\n}`;
+            prompt = `📌 DESAFÍO 12 (Avanzado): Pure View Methods (Solidity)\nDefine la función pure getFinalStatus() devolviendo "Curso 12 Completado".`;
+        }
+    }
+    // Fallback
+    else {
+        exampleCode = `// Ejemplo Guiado - Curso ${numStr}: ${courseTitle}\nconsole.log("Demostración de ${courseTitle} en ${langName}");`;
+        exerciseCode = `// Ejercicio Evaluado Curso ${numStr} (${courseTitle})\nconsole.log("Curso ${numStr} Completado");`;
+        prompt = `📌 DESAFÍO DE CONSOLIDACIÓN (${langName} - Curso ${numStr}):\nAplica los conceptos de ${courseTitle} e imprime "Curso ${numStr} Completado".`;
     }
 
     return { exampleCode, exerciseCode, prompt };
 }
+
+window.closePracticeModal = function closePracticeModal() {
+    const modal = document.getElementById('practice-modal-overlay');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+};
 
 function initPracticeModalSystem() {
     const modal = document.getElementById('practice-modal-overlay');
@@ -2643,9 +2886,21 @@ function initPracticeModalSystem() {
     const btnRunExercise = document.getElementById('btn-run-practice-exercise');
     const btnEvalExercise = document.getElementById('btn-eval-practice-exercise');
 
-    if (closeBtn && modal) {
-        closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closePracticeModal);
     }
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closePracticeModal();
+            }
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closePracticeModal();
+        }
+    });
 
     if (langSelect) {
         langSelect.addEventListener('change', (e) => {
@@ -2734,12 +2989,785 @@ function initPracticeModalSystem() {
                     } else {
                         alert(`🏆 ¡FELICIDADES HÉROE! Has completado y aprobado TODOS los Cursos de la Plataforma DevHub FP.`);
                     }
-                    if (modal) modal.classList.add('hidden');
+                    closePracticeModal();
                 }, 600);
             }
         });
     }
+
+    // Auto-guardado en tiempo real en localStorage al escribir
+    const exerciseEditor = document.getElementById('practice-exercise-editor');
+    if (exerciseEditor) {
+        exerciseEditor.addEventListener('input', () => {
+            if (currentPracticeCourseId && currentPracticeLang) {
+                const saveKey = `devhub_saved_code_${currentPracticeCourseId}_${currentPracticeLang}`;
+                localStorage.setItem(saveKey, exerciseEditor.value);
+            }
+        });
+    }
+
+    // Botones de Copiar Código
+    const btnCopyExample = document.getElementById('btn-copy-example-code');
+    const btnCopyExercise = document.getElementById('btn-copy-exercise-code');
+
+    if (btnCopyExample) {
+        btnCopyExample.addEventListener('click', () => {
+            const code = document.getElementById('practice-example-editor').value;
+            navigator.clipboard.writeText(code).then(() => {
+                if (typeof showToast === 'function') showToast('📋 Código de ejemplo copiado al portapapeles', 'success');
+            }).catch(() => {
+                if (typeof showToast === 'function') showToast('❌ No se pudo copiar el código', 'error');
+            });
+        });
+    }
+
+    if (btnCopyExercise) {
+        btnCopyExercise.addEventListener('click', () => {
+            const code = document.getElementById('practice-exercise-editor').value;
+            navigator.clipboard.writeText(code).then(() => {
+                if (typeof showToast === 'function') showToast('📋 Tu solución fue copiada al portapapeles', 'success');
+            }).catch(() => {
+                if (typeof showToast === 'function') showToast('❌ No se pudo copiar la solución', 'error');
+            });
+        });
+    }
+
+    // Helper para descargar archivos de código
+    function downloadCodeFile(filename, content) {
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        if (typeof showToast === 'function') showToast(`💾 Archivo ${filename} descargado con éxito`, 'success');
+    }
+
+    // Botones de Descargar Código
+    const btnDownloadExample = document.getElementById('btn-download-example-code');
+    const btnDownloadExercise = document.getElementById('btn-download-exercise-code');
+
+    if (btnDownloadExample) {
+        btnDownloadExample.addEventListener('click', () => {
+            const code = document.getElementById('practice-example-editor').value;
+            const filenameEl = document.getElementById('example-filename');
+            const filename = (filenameEl && filenameEl.textContent.trim()) ? filenameEl.textContent.trim() : 'ejemplo_codigo.txt';
+            downloadCodeFile(filename, code);
+        });
+    }
+
+    if (btnDownloadExercise) {
+        btnDownloadExercise.addEventListener('click', () => {
+            const code = document.getElementById('practice-exercise-editor').value;
+            const filenameEl = document.getElementById('exercise-filename');
+            const filename = (filenameEl && filenameEl.textContent.trim()) ? filenameEl.textContent.trim() : 'solucion_estudiante.txt';
+            downloadCodeFile(filename, code);
+        });
+    }
+
+    // Botón de Restablecer Plantilla Inicial
+    const btnResetExercise = document.getElementById('btn-reset-exercise-code');
+    if (btnResetExercise) {
+        btnResetExercise.addEventListener('click', () => {
+            if (!currentPracticeCourseId) return;
+            const confirmReset = confirm("¿Deseas restablecer el código a la plantilla inicial? Se borrarán los cambios locales guardados.");
+            if (!confirmReset) return;
+
+            const saveKey = `devhub_saved_code_${currentPracticeCourseId}_${currentPracticeLang}`;
+            localStorage.removeItem(saveKey);
+
+            const course = PDF_COURSES_DATA.find(c => c.id === currentPracticeCourseId);
+            const sequentialList = getSequentialCourses();
+            const seqIndex = sequentialList.findIndex(c => c.id === currentPracticeCourseId);
+            const courseNum = seqIndex >= 0 ? seqIndex + 1 : 1;
+            const practiceData = getCoursePracticeCode(course, currentPracticeLang, courseNum);
+
+            const exerciseEditor = document.getElementById('practice-exercise-editor');
+            if (exerciseEditor) exerciseEditor.value = practiceData.exerciseCode;
+            if (typeof showToast === 'function') showToast('🔄 Plantilla del ejercicio restablecida', 'info');
+        });
+    }
 }
+
+/* ==========================================================================
+   MIS CURSOS - EMBEDDED CURRICULUM DATA
+   ========================================================================== */
+const EMBEDDED_CURRICULUM_DATA = {
+  "modules": [
+    {
+      "id": "py-basico",
+      "lang": "python",
+      "level": "basico",
+      "title": "01. Lógica, Algoritmos e I/O Primitivo en Python",
+      "theoryMarkdown": "### Fundamento Teórico (Adaptación PDF 1)\nUn **algoritmo** es una secuencia finita, definida y precisa de pasos con Entrada, Proceso y Salida. En Python, la entrada y salida de datos se realiza con `input()` y `print()`.\n\n### Tipos de Datos Primitivos\n- **int:** Enteros (`15`, `-5`).\n- **float:** Decimales (`3.14`).\n- **str:** Cadenas (`'Hola'`).\n- **bool:** Lógicos (`True`, `False`).\n\n### Ejemplo de Operadores y Ternario\n```python\nbolsas = 4\nprecio = 25 if bolsas >= 3 else 35\ntotal = bolsas * precio\nprint(f'Total a pagar: {total}')\n```\n\n> ⚠️ **Antipatrón a evitar:** Olvidar que `input()` siempre retorna un `str`, por lo que se requiere convertir explícitamente con `int()` o `float()` antes de operar numéricamente.",
+      "initialCode": "# Programa de Cálculo de Precio basado en el algoritmo del PDF\nbolsas = 4\nprecio = 25 if bolsas >= 3 else 35\ntotal = bolsas * precio\nprint(f\"El total a pagar es: {total}\")",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cuáles son las 4 características fundamentales de un algoritmo según el PDF?", "options": ["Finito, definido, secuencial y preciso", "Infinito, aleatorio, paralelo y abstracto", "Rápido, gráfico, numérico y dinámico", "Compilado, privado, síncrono y estático"], "correctIndex": 0, "explanation": "El PDF establece que todo algoritmo debe ser finito, definido, secuencial y preciso." },
+        { "id": 2, "question": "¿Qué retorna por defecto la función nativa input() en Python?", "options": ["int", "float", "str", "bool"], "correctIndex": 2, "explanation": "input() siempre captura la entrada del usuario como una cadena str." },
+        { "id": 3, "question": "¿Qué evalúa el operador condicional ternario '25 if bolsas >= 3 else 35'?", "options": ["Asigna 25 si bolsas es 3 o más; de lo contrario asigna 35", "Asigna siempre 35", "Genera un error de sintaxis", "Compara direcciones de memoria"], "correctIndex": 0, "explanation": "Es la sintaxis compacta de decisión rápida en Python equivalente al operador ternario ? :." }
+      ]
+    },
+    {
+      "id": "py-intermedio",
+      "lang": "python",
+      "level": "intermedio",
+      "title": "02. Arreglos, Algoritmos de Búsqueda y Ordenamiento Burbuja",
+      "theoryMarkdown": "### Fundamento Teórico (Adaptación PDF 2)\nLos **arreglos (listas)** son colecciones contiguas indexadas desde `0`.\n\n### Algoritmo de Ordenamiento Burbuja (Bubble Sort)\nCompara elementos consecutivos e intercambia posiciones si están desordenados hasta flotar el mayor al final.\n\n```python\nnumeros = [7, 2, 5, 1, 9]\nfor i in range(len(numeros) - 1):\n    for j in range(len(numeros) - 1 - i):\n        if numeros[j] > numeros[j + 1]:\n            numeros[j], numeros[j + 1] = numeros[j + 1], numeros[j]\n```",
+      "initialCode": "# Algoritmo de Ordenamiento Burbuja en Python\nnumeros = [7, 2, 5, 1, 9]\nfor i in range(len(numeros) - 1):\n    for j in range(len(numeros) - 1 - i):\n        if numeros[j] > numeros[j + 1]:\n            numeros[j], numeros[j + 1] = numeros[j + 1], numeros[j]\n\nprint(f\"Arreglo Ordenado: {numeros}\")",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Arreglo Ordenado: [1, 2, 5, 7, 9]" }],
+      "quiz": [
+        { "id": 1, "question": "¿En qué número de índice comienzan los arreglos y listas?", "options": ["1", "0", "-1", "Depende del tamaño"], "correctIndex": 1, "explanation": "El primer elemento de todo arreglo o lista se identifica con el índice 0." },
+        { "id": 2, "question": "¿Qué condición obligatoria requiere la Búsqueda Binaria según el PDF?", "options": ["El arreglo debe estar previamente ordenado", "El arreglo debe ser bidimensional", "Debe tener menos de 5 elementos", "Debe usar valores flotantes"], "correctIndex": 0, "explanation": "La búsqueda binaria requiere que los datos estén ordenados para dividir sucesivamente el rango a la mitad." },
+        { "id": 3, "question": "¿Cómo funciona el algoritmo de Ordenamiento Burbuja?", "options": ["Compara pares consecutivos e intercambia sus valores si están desordenados", "Elimina duplicados de la lista", "Multiplica cada elemento por dos", "Ordena los elementos aleatoriamente"], "correctIndex": 0, "explanation": "Compara elementos contiguos desplazando iterativamente el mayor al extremo del arreglo." }
+      ]
+    },
+    {
+      "id": "py-avanzado",
+      "lang": "python",
+      "level": "avanzado",
+      "title": "03. Gestión de Memoria, Recursión y Funciones de Orden Superior",
+      "theoryMarkdown": "### Fundamento Teórico (Adaptación PDF 2 Avanzado)\nBúsqueda Binaria Recursiva y algoritmos de división y conquista.",
+      "initialCode": "# Algoritmo de Búsqueda Binaria Recursiva\ndef busqueda_binaria(arr, inicio, fin, valor):\n    if inicio > fin: return -1\n    medio = (inicio + fin) // 2\n    if arr[medio] == valor: return medio\n    elif valor < arr[medio]: return busqueda_binaria(arr, inicio, medio - 1, valor)\n    else: return busqueda_binaria(arr, medio + 1, fin, valor)\n\ndatos = [2, 5, 8, 12, 16, 23, 38, 45, 56]\nidx = busqueda_binaria(datos, 0, len(datos) - 1, 16)\nprint(f\"Valor 16 encontrado en el indice: {idx}\")",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Valor 16 encontrado en el indice: 4" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cuál es la complejidad temporal de la Búsqueda Binaria?", "options": ["Logarítmica O(log n)", "Lineal O(n)", "Cuadrática O(n^2)", "Constante O(1)"], "correctIndex": 0, "explanation": "Al descartar la mitad del arreglo en cada paso, su complejidad es O(log n)." }
+      ]
+    },
+    {
+      "id": "cpp-basico",
+      "lang": "cpp",
+      "level": "basico",
+      "title": "01. Fundamentos de C++, I/O y Operadores Aritméticos/Relacionales",
+      "theoryMarkdown": "### Fundamento Teórico (PDF 1)\nC++ es un lenguaje compilado sensible a mayúsculas con sintaxis estricta delimitada por `;`.",
+      "initialCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 10, b = 5;\n    int suma = a + b;\n    int modulo = a % b;\n    cout << \"Suma: \" << suma << endl;\n    cout << \"Modulo: \" << modulo << endl;\n    return 0;\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma: 15" }],
+      "quiz": [
+        { "id": 1, "question": "¿Para qué sirve el operador módulo (%) en C++?", "options": ["Calcula el porcentaje", "Devuelve el residuo exacto de una división entera", "Eleva a una potencia", "Divide flotantes"], "correctIndex": 1, "explanation": "El operador % retorna el resto entero de la división entre dos números." }
+      ]
+    },
+    {
+      "id": "cpp-intermedio",
+      "lang": "cpp",
+      "level": "intermedio",
+      "title": "02. Arreglos Unidimensionales, Bidimensionales y Funciones",
+      "theoryMarkdown": "### Fundamento Teórico (PDF 2)\nArreglos estáticos `int arr[5]` y matrices `int matriz[2][3]`.",
+      "initialCode": "#include <iostream>\nusing namespace std;\n\nint sumar(int a, int b) {\n    return a + b;\n}\n\nint main() {\n    int numeros[5] = {10, 20, 30, 40, 50};\n    int sumaTotal = 0;\n    for (int i = 0; i < 5; i++) {\n        sumaTotal = sumar(sumaTotal, numeros[i]);\n    }\n    cout << \"Suma Total de Arreglo: \" << sumaTotal << endl;\n    return 0;\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma Total de Arreglo: 150" }],
+      "quiz": [
+        { "id": 1, "question": "¿Cuántos ciclos for se requieren para recorrer una matriz?", "options": ["Uno", "Dos ciclos anidados", "Tres", "Cero"], "correctIndex": 1, "explanation": "Se necesita un ciclo para filas y otro para columnas." }
+      ]
+    },
+    {
+      "id": "cpp-avanzado",
+      "lang": "cpp",
+      "level": "avanzado",
+      "title": "03. Arreglos Dinámicos en Heap, Punteros 'new' / 'delete[]'",
+      "theoryMarkdown": "### Fundamento Teórico (PDF 2 Avanzado)\nReserva en Heap con `new int[n]` y liberación obligatoria con `delete[]`.",
+      "initialCode": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n = 3;\n    int* p = new int[n];\n    p[0] = 5; p[1] = 10; p[2] = 15;\n    int suma = 0;\n    for(int i = 0; i < n; i++) suma += p[i];\n    cout << \"Suma Heap: \" << suma << endl;\n    delete[] p;\n    return 0;\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Suma Heap: 30" }],
+      "quiz": [
+        { "id": 1, "question": "¿Dónde se asigna la memoria cuando se utiliza el operador 'new' en C++?", "options": ["En el Stack", "En el Heap (memoria dinámica)", "En el registro de CPU", "En el archivo executable"], "correctIndex": 1, "explanation": "El operador new solicita espacio en el Heap." }
+      ]
+    },
+    {
+      "id": "rust-basico",
+      "lang": "rust",
+      "level": "basico",
+      "title": "01. Sintaxis, Variables y Control de Flujo en Rust",
+      "theoryMarkdown": "### Adaptación PDF 1 a Rust\nfn main(), mutabilidad explícita y macros println!.",
+      "initialCode": "fn main() {\n    let bolsas = 4;\n    let precio = if bolsas >= 3 { 25 } else { 35 };\n    let total = bolsas * precio;\n    println!(\"El total a pagar es: {}\", total);\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [{ "id": 1, "question": "¿Cómo se declara una variable mutable en Rust?", "options": ["let x = 5;", "let mut x = 5;", "var x = 5;", "const x = 5;"], "correctIndex": 1, "explanation": "let mut otorga mutabilidad a la variable." }]
+    },
+    {
+      "id": "rust-intermedio",
+      "lang": "rust",
+      "level": "intermedio",
+      "title": "02. Vectores Dinámicos, Búsqueda y Ordenamiento Burbuja en Rust",
+      "theoryMarkdown": "### Adaptación PDF 2 a Rust\nVectores dinámicos en Heap `Vec<T>`.",
+      "initialCode": "fn main() {\n    let mut numeros = vec![7, 2, 5, 1, 9];\n    let len = numeros.len();\n    for i in 0..len {\n        for j in 0..len - 1 - i {\n            if numeros[j] > numeros[j + 1] {\n                numeros.swap(j, j + 1);\n            }\n        }\n    }\n    println!(\"Vector Ordenado: {:?}\", numeros);\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Vector Ordenado: [1, 2, 5, 7, 9]" }],
+      "quiz": [{ "id": 1, "question": "¿Qué estructura de datos representa un arreglo dinámico en Heap en Rust?", "options": ["Array [T; N]", "Vec<T>", "Slice", "Tuple"], "correctIndex": 1, "explanation": "Vec<T> administra arreglos dinámicos en Heap." }]
+    },
+    {
+      "id": "rust-avanzado",
+      "lang": "rust",
+      "level": "avanzado",
+      "title": "03. Smart Pointers (Box<T>), Ownership y Prevención de Data Races",
+      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Rust\nSmart Pointers y RAII automático.",
+      "initialCode": "fn main() {\n    let val_heap: Box<i32> = Box::new(100);\n    println!(\"Valor Heap: {}\", *val_heap);\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Valor Heap: 100" }],
+      "quiz": [{ "id": 1, "question": "¿Qué hace Box<T> en Rust?", "options": ["Asigna un valor en el Heap", "Crea una UI", "Formatea JSON", "Detiene el hilo"], "correctIndex": 0, "explanation": "Box<T> asigna explícitamente el tipo en el Heap." }]
+    },
+    {
+      "id": "node-basico",
+      "lang": "node",
+      "level": "basico",
+      "title": "01. Variables, Estructuras de Control e I/O en Node.js",
+      "theoryMarkdown": "### Adaptación PDF 1 a Node.js\nTemplate literals `` `${expr}` `` y control de flujo.",
+      "initialCode": "const bolsas = 4;\nconst precio = bolsas >= 3 ? 25 : 35;\nconst total = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [{ "id": 1, "question": "¿Qué diferencia existe entre 'const' y 'let'?", "options": ["const prohíbe reasignación; let la permite", "let solo es para números", "const es más lento", "Son idénticas"], "correctIndex": 0, "explanation": "const crea una vinculación inmutable." }]
+    },
+    {
+      "id": "node-intermedio",
+      "lang": "node",
+      "level": "intermedio",
+      "title": "02. Arrays, Ordenamiento Burbuja y Funciones",
+      "theoryMarkdown": "### Adaptación PDF 2 a Node.js\nArrays dinámicos y algoritmo Bubble Sort.",
+      "initialCode": "const numeros = [7, 2, 5, 1, 9];\nfor (let i = 0; i < numeros.length - 1; i++) {\n    for (let j = 0; j < numeros.length - 1 - i; j++) {\n        if (numeros[j] > numeros[j + 1]) {\n            let temp = numeros[j];\n            numeros[j] = numeros[j + 1];\n            numeros[j + 1] = temp;\n        }\n    }\n}\nconsole.log(\"Array Ordenado:\", numeros);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Array Ordenado: [ 1, 2, 5, 7, 9 ]" }],
+      "quiz": [{ "id": 1, "question": "¿Qué método nativo de Array en JS permite ordenar elementos?", "options": ["array.sort()", "array.order()", "array.arrange()", "array.group()"], "correctIndex": 0, "explanation": ".sort() ordena arreglos in-place." }]
+    },
+    {
+      "id": "node-avanzado",
+      "lang": "node",
+      "level": "avanzado",
+      "title": "03. Asincronía, Event Loop, Promises y Async/Await",
+      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Node.js\nPromises y funciones async/await.",
+      "initialCode": "const delay = ms => new Promise(res => setTimeout(res, ms));\nasync function ejecutar() {\n    await delay(50);\n    console.log(\"Async Process Complete\");\n}\nejecutar();",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Async Process Complete" }],
+      "quiz": [{ "id": 1, "question": "¿Qué objeto encapsula el resultado de una tarea asíncrona?", "options": ["Promise", "Buffer", "Process", "Stream"], "correctIndex": 0, "explanation": "Promise representa la resolución o fallo de una tarea asíncrona." }]
+    },
+    {
+      "id": "java-basico",
+      "lang": "java",
+      "level": "basico",
+      "title": "01. Estructura Básica en Java, Variables y Operadores",
+      "theoryMarkdown": "### Adaptación PDF 1 a Java\nClases public class Main y método main.",
+      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        int bolsas = 4;\n        int precio = (bolsas >= 3) ? 25 : 35;\n        int total = bolsas * precio;\n        System.out.println(\"El total a pagar es: \" + total);\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [{ "id": 1, "question": "¿Qué método es el punto de entrada en Java?", "options": ["public static void main(String[] args)", "public void start()", "int main()", "static void execute()"], "correctIndex": 0, "explanation": "La JVM invoca main como punto de inicio." }]
+    },
+    {
+      "id": "java-intermedio",
+      "lang": "java",
+      "level": "intermedio",
+      "title": "02. Arreglos Unidimensionales y Ordenamiento Burbuja en Java",
+      "theoryMarkdown": "### Adaptación PDF 2 a Java\nArreglos primitivos `int[]` y Bubble Sort.",
+      "initialCode": "public class Main {\n    public static void main(String[] args) {\n        int[] numeros = {7, 2, 5, 1, 9};\n        for (int i = 0; i < numeros.length - 1; i++) {\n            for (int j = 0; j < numeros.length - 1 - i; j++) {\n                if (numeros[j] > numeros[j + 1]) {\n                    int temp = numeros[j];\n                    numeros[j] = numeros[j + 1];\n                    numeros[j + 1] = temp;\n                }\n            }\n        }\n        System.out.println(\"Arreglo Ordenado: \" + java.util.Arrays.toString(numeros));\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Arreglo Ordenado: [1, 2, 5, 7, 9]" }],
+      "quiz": [{ "id": 1, "question": "¿Qué método convierte un arreglo int[] a String formateado?", "options": ["Arrays.toString(arr)", "arr.toString()", "String.valueOf(arr)", "Arrays.print(arr)"], "correctIndex": 0, "explanation": "Arrays.toString(arr) genera [1, 2, 3]." }]
+    },
+    {
+      "id": "java-avanzado",
+      "lang": "java",
+      "level": "avanzado",
+      "title": "03. Generics, Stream API y Manejo de Excepciones",
+      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Java\nStream API y ordenamiento declarativo.",
+      "initialCode": "import java.util.Arrays;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> datos = Arrays.asList(7, 2, 5, 1, 9);\n        datos.stream().sorted().forEach(n -> System.out.print(n + \" \"));\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "1 2 5 7 9" }],
+      "quiz": [{ "id": 1, "question": "¿Qué operador introduce expresiones Lambda en Java 8+?", "options": ["->", "=>", "::", ":="], "correctIndex": 0, "explanation": "El operador flecha -> separa los parámetros del cuerpo." }]
+    },
+    {
+      "id": "sql-basico",
+      "lang": "sql",
+      "level": "basico",
+      "title": "01. Tablas, Inserciones y Filtrado WHERE",
+      "theoryMarkdown": "### Adaptación PDF 1 a SQL\nDDL (`CREATE TABLE`) y DML (`INSERT INTO`, `SELECT`).",
+      "initialCode": "CREATE TABLE compras (id INT, bolsas INT, total INT);\nINSERT INTO compras VALUES (1, 4, 100), (2, 2, 70);\nSELECT * FROM compras WHERE bolsas >= 3;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "100" }],
+      "quiz": [{ "id": 1, "question": "¿Qué instrucción DDL crea una nueva tabla?", "options": ["CREATE TABLE", "MAKE TABLE", "ADD TABLE", "NEW TABLE"], "correctIndex": 0, "explanation": "CREATE TABLE define el esquema." }]
+    },
+    {
+      "id": "sql-intermedio",
+      "lang": "sql",
+      "level": "intermedio",
+      "title": "02. Agregaciones (COUNT, AVG, SUM) y Ordenamiento ORDER BY",
+      "theoryMarkdown": "### Adaptación PDF 2 a SQL\nFunciones agregadas y cláusula `ORDER BY`.",
+      "initialCode": "CREATE TABLE productos (id INT, nombre TEXT, precio INT);\nINSERT INTO productos VALUES (1, 'Bolsas Pequenas', 35), (2, 'Bolsas Grandes', 25);\nSELECT * FROM productos ORDER BY precio ASC;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Bolsas Grandes" }],
+      "quiz": [{ "id": 1, "question": "¿Qué cláusula ordena el resultado de una consulta SQL?", "options": ["ORDER BY", "GROUP BY", "SORT BY", "ALIGN BY"], "correctIndex": 0, "explanation": "ORDER BY especifica el orden." }]
+    },
+    {
+      "id": "sql-avanzado",
+      "lang": "sql",
+      "level": "avanzado",
+      "title": "03. Relaciones y Joins entre Tablas (INNER JOIN)",
+      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a SQL\nCombinación de relaciones con `INNER JOIN`.",
+      "initialCode": "CREATE TABLE clientes (id INT, nombre TEXT);\nCREATE TABLE pedidos (id INT, cliente_id INT, total INT);\nINSERT INTO clientes VALUES (1, 'Alex'), (2, 'Maria');\nINSERT INTO pedidos VALUES (101, 1, 100);\nSELECT clientes.nombre, pedidos.total FROM clientes INNER JOIN pedidos ON clientes.id = pedidos.cliente_id;",
+      "testCases": [{ "input": "N/A", "expectedOutput": "100" }],
+      "quiz": [{ "id": 1, "question": "¿Qué filas retorna un INNER JOIN?", "options": ["Solo las filas que coinciden en ambas tablas", "Todas las filas de ambas", "Solo la tabla izquierda", "Ninguna"], "correctIndex": 0, "explanation": "INNER JOIN combina filas con coincidencias en la condición ON." }]
+    },
+    {
+      "id": "typescript-basico",
+      "lang": "typescript",
+      "level": "basico",
+      "title": "01. Tipado Explicito, Variables y Operadores en TypeScript",
+      "theoryMarkdown": "### Adaptación PDF 1 a TypeScript\nTipado estático `: number` y comillas invertidas `` `${expr}` ``.",
+      "initialCode": "let bolsas: number = 4;\nlet precio: number = bolsas >= 3 ? 25 : 35;\nlet total: number = bolsas * precio;\nconsole.log(`El total a pagar es: ${total}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [{ "id": 1, "question": "¿Cómo se especifica el tipo de una variable numérica?", "options": ["let x: number = 5;", "let number x = 5;", "int x = 5;", "var x: int = 5;"], "correctIndex": 0, "explanation": "Sintaxis variable: tipo." }]
+    },
+    {
+      "id": "typescript-intermedio",
+      "lang": "typescript",
+      "level": "intermedio",
+      "title": "02. Interfaces, Arrays Tipados y Ordenamiento en TypeScript",
+      "theoryMarkdown": "### Adaptación PDF 2 a TypeScript\nInterfaces estructurales para objetos y tipos.",
+      "initialCode": "interface Producto {\n    nombre: string;\n    precio: number;\n}\nconst item: Producto = { nombre: \"Bolsas\", precio: 25 };\nconsole.log(`${item.nombre}: $${item.precio}`);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Bolsas: $25" }],
+      "quiz": [{ "id": 1, "question": "¿Para qué sirve 'interface' en TypeScript?", "options": ["Para definir la forma y tipo de propiedades de un objeto", "Para crear HTML", "Para compilar C++", "Para borrar arreglos"], "correctIndex": 0, "explanation": "interface define contratos de objetos." }]
+    },
+    {
+      "id": "typescript-avanzado",
+      "lang": "typescript",
+      "level": "avanzado",
+      "title": "03. Generics <T>, Mapped Types y Type Guards",
+      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a TypeScript\nGenerics `<T>` reutilizables con seguridad de tipo.",
+      "initialCode": "function envolver<T>(val: T): { data: T } {\n    return { data: val };\n}\nconst res = envolver<string>(\"TS Avanzado OK\");\nconsole.log(res.data);",
+      "testCases": [{ "input": "N/A", "expectedOutput": "TS Avanzado OK" }],
+      "quiz": [{ "id": 1, "question": "¿Cuál es la utilidad de Generics <T>?", "options": ["Permiten abstraer tipos concretos manteniendo la seguridad estática", "Aumentan tamaño del JS", "Solo sirven para strings", "Conectan BD"], "correctIndex": 0, "explanation": "Los genéricos permiten reutilización de componentes tipados." }]
+    },
+    {
+      "id": "solidity-basico",
+      "lang": "solidity",
+      "level": "basico",
+      "title": "01. Contratos, Pragma e I/O en Solidity EVM",
+      "theoryMarkdown": "### Adaptación PDF 1 a Solidity\nContratos en EVM con uint256 y variables de estado public.",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract CalculoCompra {\n    string public estado = \"El total a pagar es: 100\";\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "El total a pagar es: 100" }],
+      "quiz": [{ "id": 1, "question": "¿Dónde se ejecutan los Smart Contracts?", "options": ["En la EVM", "En el navegador", "En el disco local", "En la BD"], "correctIndex": 0, "explanation": "Los contratos se ejecutan dentro de la Ethereum Virtual Machine." }]
+    },
+    {
+      "id": "solidity-intermedio",
+      "lang": "solidity",
+      "level": "intermedio",
+      "title": "02. Funciones Pure, View y Arrays de Estado",
+      "theoryMarkdown": "### Adaptación PDF 2 a Solidity\nFunciones `view` y arreglos dinámicos en storage.",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract ArregloEVM {\n    uint256[] public numeros = [1, 2, 5, 7, 9];\n    function obtenerPrimero() public view returns (uint256) {\n        return numeros[0];\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "1" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué diferencia existe entre 'view' y 'pure'?", "options": ["'view' lee el estado; 'pure' ni lee ni modifica", "'pure' modifica la cadena", "'view' cobra gas", "Son idénticas"], "correctIndex": 0, "explanation": "view lee storage; pure solo opera con parámetros recibidos." }
+      ]
+    },
+    {
+      "id": "solidity-avanzado",
+      "lang": "solidity",
+      "level": "avanzado",
+      "title": "03. Mappings, Custom Errors y Optimización de Gas",
+      "theoryMarkdown": "### Adaptación PDF 2 Avanzado a Solidity\nMappings asociativos e inmutabilidad en EVM.",
+      "initialCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract StorageOptimized {\n    mapping(address => string) public usuarios;\n    constructor() {\n        usuarios[msg.sender] = \"Solidity Avanzado OK\";\n    }\n}",
+      "testCases": [{ "input": "N/A", "expectedOutput": "Solidity Avanzado OK" }],
+      "quiz": [
+        { "id": 1, "question": "¿Qué representa la variable global msg.sender?", "options": ["La dirección del emisor de la transacción", "El saldo del contrato", "El número de bloque", "La fecha"], "correctIndex": 0, "explanation": "msg.sender contiene la dirección de 20 bytes del iniciador del call." }
+      ]
+    }
+  ]
+};
+
+/* ==========================================================================
+   MIS CURSOS - SPLIT VIEW & EXECUTOR ENGINE CONTROLLER (UNKLOCK PROGRESSION)
+   ========================================================================== */
+let coursesDataGlobal = null;
+let currentCourseLang = 'cpp';
+let currentCourseLevel = 'basico';
+
+const LANGUAGE_PROGRESSION_SEQUENCE = [
+    { id: 'cpp', name: 'C++', icon: '⚙️' },
+    { id: 'python', name: 'Python', icon: '🐍' },
+    { id: 'rust', name: 'Rust', icon: '🦀' },
+    { id: 'node', name: 'Node.js', icon: '🟢' },
+    { id: 'java', name: 'Java', icon: '☕' },
+    { id: 'sql', name: 'SQL', icon: '🗄️' },
+    { id: 'typescript', name: 'TypeScript', icon: '🟦' },
+    { id: 'solidity', name: 'Solidity', icon: '⛓️' }
+];
+
+let isDocenteAdminMode = localStorage.getItem('devhub_docente_admin_mode') === 'true';
+
+function isLanguageUnlocked(langId) {
+    if (isDocenteAdminMode) return true; // 👑 Modo Docente/Administrador: ¡Todo Desbloqueado!
+    
+    const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
+    if (idx <= 0) return true; // C++ is unlocked by default!
+    
+    const prevLangId = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1].id;
+    return isLanguageCompleted(prevLangId);
+}
+
+function initDocenteAdminToggle() {
+    const btn = document.getElementById('btn-toggle-docente-admin');
+    if (!btn) return;
+
+    function updateBtnUI() {
+        if (isDocenteAdminMode) {
+            btn.textContent = '👑 Modo Docente: ACTIVADO (Todo Desbloqueado)';
+            btn.className = 'btn btn-primary btn-sm';
+            btn.style.background = '#f59e0b';
+            btn.style.color = '#000';
+            btn.style.fontWeight = 'bold';
+        } else {
+            btn.textContent = '👑 Modo Docente: Desbloquear Todo';
+            btn.className = 'btn btn-outline btn-sm';
+            btn.style.borderColor = '#f59e0b';
+            btn.style.color = '#f59e0b';
+        }
+    }
+
+    updateBtnUI();
+
+    btn.addEventListener('click', () => {
+        isDocenteAdminMode = !isDocenteAdminMode;
+        localStorage.setItem('devhub_docente_admin_mode', isDocenteAdminMode ? 'true' : 'false');
+        updateBtnUI();
+        updateLanguageSelectorUI();
+
+        if (isDocenteAdminMode) {
+            if (typeof showToast === 'function') {
+                showToast('👑 Modo Administrador / Docente ACTIVADO: Todos los 8 lenguajes y cursos están DESBLOQUEADOS.', 'success');
+            }
+        } else {
+            if (typeof showToast === 'function') {
+                showToast('🎓 Modo Estudiante ACTIVADO: Progreso secuencial restaurado.', 'info');
+            }
+        }
+    });
+}
+
+function isLanguageCompleted(langId) {
+    const levels = ['basico', 'intermedio', 'avanzado'];
+    return levels.every(level => {
+        return localStorage.getItem(`devhub_course_completed_${langId}_${level}`) === 'true';
+    });
+}
+
+function getLanguageCompletedCount(langId) {
+    const levels = ['basico', 'intermedio', 'avanzado'];
+    let count = 0;
+    levels.forEach(l => {
+        if (localStorage.getItem(`devhub_course_completed_${langId}_${l}`) === 'true') count++;
+    });
+    return count;
+}
+
+function updateLanguageSelectorUI() {
+    const langSelect = document.getElementById('course-lang-select');
+    if (!langSelect) return;
+
+    Array.from(langSelect.options).forEach(opt => {
+        const langId = opt.value;
+        const seqItem = LANGUAGE_PROGRESSION_SEQUENCE.find(l => l.id === langId);
+        const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
+        const unlocked = isLanguageUnlocked(langId);
+        const completed = isLanguageCompleted(langId);
+        const count = getLanguageCompletedCount(langId);
+
+        if (completed) {
+            opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (✅ Completado 3/3)`;
+        } else if (unlocked) {
+            opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (🔓 Desbloqueado ${count}/3)`;
+        } else {
+            const prevName = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1] ? LANGUAGE_PROGRESSION_SEQUENCE[idx - 1].name : '';
+            opt.textContent = `${idx + 1}. 🔒 ${seqItem ? seqItem.name : langId} (Bloqueado - Completa ${prevName})`;
+        }
+    });
+
+    const unlockBadge = document.getElementById('course-unlock-badge');
+    if (unlockBadge) {
+        const currentSeq = LANGUAGE_PROGRESSION_SEQUENCE.find(l => l.id === currentCourseLang);
+        const count = getLanguageCompletedCount(currentCourseLang);
+        if (isLanguageCompleted(currentCourseLang)) {
+            unlockBadge.textContent = `✅ ${currentSeq ? currentSeq.name : currentCourseLang} Completado (3/3 Cursos)`;
+            unlockBadge.className = 'badge badge-success';
+        } else if (isLanguageUnlocked(currentCourseLang)) {
+            unlockBadge.textContent = `🔓 ${currentSeq ? currentSeq.name : currentCourseLang} Desbloqueado (${count}/3 Cursos)`;
+            unlockBadge.className = 'badge badge-accent';
+        } else {
+            unlockBadge.textContent = `🔒 ${currentSeq ? currentSeq.name : currentCourseLang} Bloqueado`;
+            unlockBadge.className = 'badge badge-danger';
+        }
+    }
+}
+
+async function initMisCursosSystem() {
+    coursesDataGlobal = EMBEDDED_CURRICULUM_DATA;
+
+    const langSelect = document.getElementById('course-lang-select');
+    const levelSelect = document.getElementById('course-level-select');
+    const btnRunCode = document.getElementById('btn-run-code');
+    const btnVerifyTestCases = document.getElementById('btn-verify-test-cases');
+    const btnCopyCode = document.getElementById('btn-copy-code');
+    const btnDownloadCode = document.getElementById('btn-download-code');
+    const btnResetCode = document.getElementById('btn-reset-code');
+    const codeEditor = document.getElementById('monaco-code-editor');
+
+    try {
+        const resp = await fetch('courses-data.json');
+        if (resp.ok) {
+            const externalData = await resp.json();
+            if (externalData && externalData.modules) {
+                coursesDataGlobal = externalData;
+            }
+        }
+    } catch (e) {
+        console.warn("Utilizando esquema curricular integrado localmente:", e);
+    }
+
+    if (langSelect) {
+        langSelect.addEventListener('change', (e) => {
+            const selectedLang = e.target.value;
+            if (!isLanguageUnlocked(selectedLang)) {
+                const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === selectedLang);
+                const prevLang = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1];
+                if (typeof showToast === 'function') {
+                    showToast(`🔒 Lenguaje Bloqueado: Debes completar los 3 cursos de ${prevLang ? prevLang.name : 'el lenguaje anterior'} primero.`, 'error');
+                }
+                langSelect.value = currentCourseLang;
+                return;
+            }
+            currentCourseLang = selectedLang;
+            renderMisCursosModule();
+        });
+    }
+
+    if (levelSelect) {
+        levelSelect.addEventListener('change', (e) => {
+            currentCourseLevel = e.target.value;
+            renderMisCursosModule();
+        });
+    }
+
+    if (codeEditor) {
+        codeEditor.addEventListener('input', () => {
+            const saveKey = `devhub_course_code_${currentCourseLang}_${currentCourseLevel}`;
+            localStorage.setItem(saveKey, codeEditor.value);
+        });
+    }
+
+    if (btnRunCode) {
+        btnRunCode.addEventListener('click', async () => {
+            const code = codeEditor ? codeEditor.value : '';
+            const term = document.getElementById('practice-terminal-output');
+            const timeBadge = document.getElementById('exec-time-badge');
+            if (term) term.innerHTML = '<span class="term-dim">⚡ Compilando y ejecutando código...</span>';
+
+            const res = await ExecutionEngine.executeCode(currentCourseLang, code);
+            if (timeBadge) timeBadge.textContent = `⚡ ${res.executionTimeMs || 0} ms`;
+
+            if (term) {
+                if (res.isError) {
+                    term.innerHTML = res.logs.map(l => `<div class="term-error" style="color:#ef4444;">${l}</div>`).join('');
+                } else {
+                    term.innerHTML = res.logs.map(l => `<div>${l}</div>`).join('');
+                    if (res.tableHtml) term.innerHTML += res.tableHtml;
+                }
+            }
+        });
+    }
+
+    if (btnVerifyTestCases) {
+        btnVerifyTestCases.addEventListener('click', async () => {
+            const code = codeEditor ? codeEditor.value : '';
+            const module = getCurrentModule();
+            if (!module) return;
+
+            const res = await ExecutionEngine.runTestCases(currentCourseLang, code, module.testCases || []);
+            renderTestCaseResults(res);
+
+            if (res.passed === res.total && res.total > 0) {
+                const passKey = `devhub_course_completed_${currentCourseLang}_${currentCourseLevel}`;
+                const wasCompletedBefore = localStorage.getItem(passKey) === 'true';
+                localStorage.setItem(passKey, 'true');
+
+                updateLanguageSelectorUI();
+
+                if (isLanguageCompleted(currentCourseLang)) {
+                    const currentIdx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === currentCourseLang);
+                    if (currentIdx >= 0 && currentIdx < LANGUAGE_PROGRESSION_SEQUENCE.length - 1) {
+                        const nextLang = LANGUAGE_PROGRESSION_SEQUENCE[currentIdx + 1];
+                        if (typeof showToast === 'function') {
+                            showToast(`🎉 ¡Felicidades! Has completado ${LANGUAGE_PROGRESSION_SEQUENCE[currentIdx].name}. ¡${nextLang.name} ha sido DESBLOQUEADO! 🔓`, 'success');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast(`🏆 ¡FELICIDADES! Has completado TODOS los 8 lenguajes de programación del curso.`, 'success');
+                        }
+                    }
+                } else if (!wasCompletedBefore) {
+                    if (typeof showToast === 'function') {
+                        showToast(`🎉 ¡Curso Aprobado! Progreso en ${currentCourseLang.toUpperCase()}: ${getLanguageCompletedCount(currentCourseLang)}/3`, 'success');
+                    }
+                }
+            } else {
+                if (typeof showToast === 'function') showToast('❌ Algunos casos de prueba fallaron', 'error');
+            }
+        });
+    }
+
+    if (btnCopyCode) {
+        btnCopyCode.addEventListener('click', () => {
+            if (codeEditor) {
+                navigator.clipboard.writeText(codeEditor.value).then(() => {
+                    if (typeof showToast === 'function') showToast('📋 Código copiado al portapapeles', 'success');
+                });
+            }
+        });
+    }
+
+    if (btnDownloadCode) {
+        btnDownloadCode.addEventListener('click', () => {
+            if (!codeEditor) return;
+            const extMap = { python: 'py', cpp: 'cpp', rust: 'rs', node: 'js', java: 'java', sql: 'sql', typescript: 'ts', solidity: 'sol' };
+            const ext = extMap[currentCourseLang] || 'txt';
+            const filename = `solucion_${currentCourseLang}_${currentCourseLevel}.${ext}`;
+            const blob = new Blob([codeEditor.value], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            if (typeof showToast === 'function') showToast(`💾 Archivo ${filename} descargado`, 'success');
+        });
+    }
+
+    if (btnResetCode) {
+        btnResetCode.addEventListener('click', () => {
+            const saveKey = `devhub_course_code_${currentCourseLang}_${currentCourseLevel}`;
+            localStorage.removeItem(saveKey);
+            renderMisCursosModule();
+            if (typeof showToast === 'function') showToast('🔄 Código restablecido a la plantilla inicial', 'info');
+        });
+    }
+
+    renderMisCursosModule();
+}
+
+function getCurrentModule() {
+    if (!coursesDataGlobal || !coursesDataGlobal.modules) return null;
+    return coursesDataGlobal.modules.find(m => m.lang === currentCourseLang && m.level === currentCourseLevel) || coursesDataGlobal.modules[0];
+}
+
+function renderMisCursosModule() {
+    updateLanguageSelectorUI();
+    const module = getCurrentModule();
+    if (!module) return;
+
+    const theoryTitle = document.getElementById('theory-panel-title');
+    const theoryBody = document.getElementById('theory-markdown-body');
+    const practiceTitle = document.getElementById('practice-panel-title');
+    const codeEditor = document.getElementById('monaco-code-editor');
+
+    if (theoryTitle) theoryTitle.textContent = module.title || 'Teoría del Módulo';
+    if (theoryBody) {
+        theoryBody.innerHTML = parseSimpleMarkdown(module.theoryMarkdown || '');
+    }
+
+    const langName = currentCourseLang.toUpperCase();
+    if (practiceTitle) practiceTitle.textContent = `Editor ${langName} (${currentCourseLevel.toUpperCase()})`;
+
+    const saveKey = `devhub_course_code_${currentCourseLang}_${currentCourseLevel}`;
+    const savedCode = localStorage.getItem(saveKey);
+    if (codeEditor) {
+        codeEditor.value = (savedCode !== null && savedCode.trim() !== '') ? savedCode : module.initialCode || '';
+    }
+
+    renderQuizPanel(module.quiz || []);
+    renderTestCaseResults({ total: (module.testCases || []).length, passed: 0, results: [] });
+}
+
+function parseSimpleMarkdown(md) {
+    if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
+        return marked.parse(md);
+    }
+    return md
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/> (.*$)/gim, '<blockquote>$1</blockquote>')
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+        .replace(/\n/g, '<br>');
+}
+
+function renderTestCaseResults(res) {
+    const listEl = document.getElementById('test-cases-list');
+    const scoreBadge = document.getElementById('test-cases-score-badge');
+
+    if (scoreBadge) {
+        scoreBadge.textContent = `${res.passed} / ${res.total} Pasados`;
+        scoreBadge.className = res.passed === res.total && res.total > 0 ? 'badge badge-success' : 'badge';
+    }
+
+    if (!listEl) return;
+    if (!res.results || res.results.length === 0) {
+        listEl.innerHTML = '<span class="term-dim">Presiona "🚀 Verificar Casos" para evaluar tu respuesta.</span>';
+        return;
+    }
+
+    listEl.innerHTML = res.results.map(r => `
+        <div class="test-case-item ${r.passed ? 'passed' : 'failed'}">
+            <div>
+                <strong>Caso ${r.index || 1}:</strong> Esperado: <code>${r.expected}</code>
+            </div>
+            <div>
+                ${r.passed ? '✅ PASÓ' : '❌ FALLÓ'}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderQuizPanel(quizList) {
+    const quizBody = document.getElementById('quiz-panel-body');
+    if (!quizBody) return;
+
+    if (!quizList || quizList.length === 0) {
+        quizBody.innerHTML = '<span class="term-dim">No hay preguntas de quiz configuradas para este nivel.</span>';
+        return;
+    }
+
+    let html = `<div class="quiz-container-box">`;
+    quizList.forEach((q, qIdx) => {
+        html += `
+            <div class="quiz-card-item" id="quiz-card-${qIdx}">
+                <div class="quiz-card-question">Pregunta ${qIdx + 1}: ${q.question}</div>
+                <div class="quiz-options-group">
+                    ${q.options.map((opt, oIdx) => `
+                        <button class="quiz-opt-btn" onclick="checkQuizAnswer('${currentCourseLang}', '${currentCourseLevel}', ${qIdx}, ${oIdx}, ${q.correctIndex}, '${encodeURIComponent(q.explanation)}')">${String.fromCharCode(65 + oIdx)}) ${opt}</button>
+                    `).join('')}
+                </div>
+                <div class="quiz-feedback-box hidden" id="quiz-feedback-${qIdx}"></div>
+            </div>
+        `;
+    });
+    html += `</div>`;
+
+    quizBody.innerHTML = html;
+}
+
+window.checkQuizAnswer = function(lang, level, qIdx, selectedIdx, correctIdx, explanationEnc) {
+    const card = document.getElementById(`quiz-card-${qIdx}`);
+    const feedbackBox = document.getElementById(`quiz-feedback-${qIdx}`);
+    if (!card || !feedbackBox) return;
+
+    const explanation = decodeURIComponent(explanationEnc);
+    const buttons = card.querySelectorAll('.quiz-opt-btn');
+
+    buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === correctIdx) {
+            btn.classList.add('correct');
+        } else if (idx === selectedIdx) {
+            btn.classList.add('incorrect');
+        }
+    });
+
+    feedbackBox.classList.remove('hidden');
+    if (selectedIdx === correctIdx) {
+        feedbackBox.className = 'quiz-feedback-box correct';
+        feedbackBox.innerHTML = `<strong>✅ ¡Respuesta Correcta!</strong><br>${explanation}`;
+        if (typeof showToast === 'function') showToast('🎯 ¡Respuesta Correcta!', 'success');
+    } else {
+        feedbackBox.className = 'quiz-feedback-box incorrect';
+        feedbackBox.innerHTML = `<strong>❌ Respuesta Incorrecta.</strong><br>${explanation}`;
+        if (typeof showToast === 'function') showToast('❌ Respuesta Incorrecta', 'error');
+    }
+};
 
 function initTabNavigationSystem() {
     const navLinks = document.querySelectorAll('.nav-link, .nav-logo, a[href^="#"]');
@@ -2782,7 +3810,7 @@ function initTabNavigationSystem() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             const href = link.getAttribute('href');
-            if (href && href.startsWith('#')) {
+            if (href && href.startsWith('#') && href.length > 1) {
                 e.preventDefault();
                 window.location.hash = href;
                 switchView(href);
@@ -3329,3 +4357,139 @@ function initShareLinkModalEvents() {
         });
     }
 }
+
+/* ==========================================================================
+   PDF CATALOG & READ-ONLY VIEWER ENGINE (PARCIALES 1, 2 Y 3)
+   ========================================================================== */
+const OFFICIAL_PDF_DOCUMENTS = [
+    // PDF 1 Parcial
+    { id: 'pdf-p1-01', title: '01. ¿Qué es la Programación?', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/01-Que-es-La-Programacion.pdf' },
+    { id: 'pdf-p1-02', title: '02. Pensamiento Lógico', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/02-PensamientoLogico.pdf' },
+    { id: 'pdf-p1-03', title: '03. Introducción al Pensamiento Lógico', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/03-Introduccion-al-Pensamiento-logico.pdf' },
+    { id: 'pdf-p1-04', title: '04. Fundamentos del Lenguaje C++', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/04-Fundamentos-del-Lenguaje-C.pdf' },
+    { id: 'pdf-p1-05', title: '05. Variables, Entradas y Salidas en C++', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/05-Vairalbes-Entradas-y-Salidas-en-C.pdf' },
+    { id: 'pdf-p1-06', title: '06. Operadores Aritméticos', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/06-Operadores-aritmeticos.pdf' },
+    { id: 'pdf-p1-07', title: '07. Operadores Lógicos', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/07-Operadores-logicos.pdf' },
+    { id: 'pdf-p1-08', title: '08. Operadores Relacionales', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/08-Operadores-relacionales.pdf' },
+    { id: 'pdf-p1-09', title: '09. Operadores Condicionales', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/09-Operadores-condicionales.pdf' },
+    { id: 'pdf-p1-10', title: '10. Estructuras de Control I', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/10-Estructuras-de-control.pdf' },
+    { id: 'pdf-p1-11', title: '11. Estructuras de Control II', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/11-Estructuras-de-control-II.pdf' },
+    { id: 'pdf-p1-12', title: '12. Estructuras de Control III', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/12-Estructuras-de-control-III.pdf' },
+    { id: 'pdf-p1-13', title: '13. Repaso Práctico Parcial I', parcial: 'p1', parcialTitle: 'PDF 1 Parcial', file: 'PDF 1 Parcial/13-Repaso-General-Practico-Parcial-I.pdf' },
+
+    // PDF 2 Parcial
+    { id: 'pdf-p2-14', title: '14. Arreglo Unidimensional', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/14-Arreglo-Unidimensional.pdf' },
+    { id: 'pdf-p2-15', title: '15. Arreglos Bidimensionales', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/15-Arreglo-Bidimencionales.pdf' },
+    { id: 'pdf-p2-16', title: '16. Arreglos Dinámicos', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/16-Arreglos-Dinamicos.pdf' },
+    { id: 'pdf-p2-17', title: '17. Algoritmos de Búsqueda I', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/17-Algoritmos-de-busqueda-I.pdf' },
+    { id: 'pdf-p2-18', title: '18. Algoritmos de Búsqueda II', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/18-Algoritmos-de-busqueda-II.pdf' },
+    { id: 'pdf-p2-19', title: '19. Ordenamiento de Arreglos', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/19-Ordenamiento-de-Arreglos.pdf' },
+    { id: 'pdf-p2-21', title: '21. Ejercicios Arreglos II', parcial: 'p2', parcialTitle: 'PDF 2 Parcial', file: 'PDF 2 Parcial/21-Ejercicios-arreglos-II.pdf' },
+
+    // PDF 3 Parcial
+    { id: 'pdf-p3-22', title: '22. Funciones - Parte 1', parcial: 'p3', parcialTitle: 'PDF 3 Parcial', file: 'PDF 3 Parcial/22-Funciones-Parte1 (1).pdf' },
+    { id: 'pdf-p3-23', title: '23. Funciones - Parte 2', parcial: 'p3', parcialTitle: 'PDF 3 Parcial', file: 'PDF 3 Parcial/23-Funciones-Parte2.pdf' },
+    { id: 'pdf-p3-24', title: '24. Estructuras (Structs)', parcial: 'p3', parcialTitle: 'PDF 3 Parcial', file: 'PDF 3 Parcial/24-Estructuras.pdf' },
+    { id: 'pdf-p3-25', title: '25. Estructuras como Parámetros', parcial: 'p3', parcialTitle: 'PDF 3 Parcial', file: 'PDF 3 Parcial/25-Estructuras-como-Parametros-de-Funciones.pdf' },
+    { id: 'pdf-p3-26', title: '26. Arreglos de Estructuras', parcial: 'p3', parcialTitle: 'PDF 3 Parcial', file: 'PDF 3 Parcial/26-Arreglos-de-estructuras.pdf' }
+];
+
+let customUploadedPdfList = [];
+
+function initPdfCatalogEngine() {
+    renderPdfCatalogGrid('all');
+
+    const filterBtns = document.querySelectorAll('.pdf-filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const parcial = btn.getAttribute('data-parcial');
+            renderPdfCatalogGrid(parcial);
+        });
+    });
+
+    const uploadInput = document.getElementById('input-upload-pdf');
+    if (uploadInput) {
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const objectUrl = URL.createObjectURL(file);
+            const newDoc = {
+                id: `pdf-user-${Date.now()}`,
+                title: file.name.replace('.pdf', ''),
+                parcial: 'p1',
+                parcialTitle: 'PDF Subido (Docente)',
+                file: objectUrl,
+                isCustom: true
+            };
+
+            customUploadedPdfList.unshift(newDoc);
+            renderPdfCatalogGrid('all');
+
+            if (typeof showToast === 'function') {
+                showToast(`📤 Documento PDF '${file.name}' subido con éxito al catálogo en Modo Solo Lectura.`, 'success');
+            }
+        });
+    }
+
+    const modalCloseBtn = document.getElementById('btn-close-pdf-modal');
+    const modal = document.getElementById('pdf-viewer-modal');
+    if (modalCloseBtn && modal) {
+        modalCloseBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            const frame = document.getElementById('pdf-frame-element');
+            if (frame) frame.src = '';
+        });
+    }
+}
+
+function renderPdfCatalogGrid(parcialFilter) {
+    const grid = document.getElementById('pdf-courses-grid');
+    if (!grid) return;
+
+    const allDocs = [...customUploadedPdfList, ...OFFICIAL_PDF_DOCUMENTS];
+    const filtered = allDocs.filter(doc => parcialFilter === 'all' || doc.parcial === parcialFilter);
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '<span class="term-dim">No hay documentos PDF disponibles en este parcial.</span>';
+        return;
+    }
+
+    grid.innerHTML = filtered.map(doc => `
+        <div class="pdf-card" style="background: #040914; border: 1px solid var(--border-glow); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: transform 0.2s;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <span style="font-size: 1.8rem;">📄</span>
+                    <span class="badge badge-accent" style="font-size: 0.7rem;">🔒 Solo Lectura</span>
+                </div>
+                <h4 style="margin: 0 0 4px 0; font-size: 0.95rem; color: var(--secondary); font-weight: 700;">${doc.title}</h4>
+                <span style="font-size: 0.75rem; color: var(--text-dim); font-weight: 600;">${doc.parcialTitle}</span>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="openPdfViewerModal('${encodeURIComponent(doc.file)}', '${encodeURIComponent(doc.title)}', '${doc.parcialTitle}')" style="width: 100%; margin-top: 8px;">👁️ Leer PDF</button>
+        </div>
+    `).join('');
+}
+
+window.openPdfViewerModal = function(fileEnc, titleEnc, parcialTitle) {
+    const file = decodeURIComponent(fileEnc);
+    const title = decodeURIComponent(titleEnc);
+    const modal = document.getElementById('pdf-viewer-modal');
+    const frame = document.getElementById('pdf-frame-element');
+    const titleEl = document.getElementById('pdf-modal-filename');
+    const subTitleEl = document.getElementById('pdf-modal-subtitle');
+
+    if (!modal || !frame) return;
+
+    if (titleEl) titleEl.textContent = title;
+    if (subTitleEl) subTitleEl.textContent = `${parcialTitle} • Modo Lectura Protegido`;
+
+    // #toolbar=0 disables downloading/printing in standard browser PDF plugin
+    frame.src = `${file}#toolbar=0&navpanes=0&view=FitH`;
+    modal.classList.remove('hidden');
+
+    if (typeof showToast === 'function') {
+        showToast(`📄 Abriendo ${title} en Solo Lectura`, 'info');
+    }
+};

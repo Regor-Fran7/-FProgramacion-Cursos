@@ -50,10 +50,10 @@
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="#hero" class="nav-link active"><span class="nav-link-icon">🏠</span><span
                             class="nav-link-text">Inicio</span></a></li>
+                <li><a href="#mis-cursos" class="nav-link"><span class="nav-link-icon">🎓</span><span
+                            class="nav-link-text">Mis Cursos</span></a></li>
                 <li><a href="#lenguajes" class="nav-link"><span class="nav-link-icon">💻</span><span
                             class="nav-link-text">Lenguajes</span></a></li>
-                <li><a href="#cursos" class="nav-link"><span class="nav-link-icon">📚</span><span
-                            class="nav-link-text">Cursos PDF</span></a></li>
                 <li><a href="#visor-codigo" class="nav-link"><span class="nav-link-icon">👁️</span><span
                             class="nav-link-text">Visor de Código</span></a></li>
                 <li><a href="#calculadora" class="nav-link"><span class="nav-link-icon">📊</span><span
@@ -115,8 +115,8 @@
                     conocimientos en Python, C++, Rust, Node.js, Java, SQL, TypeScript y Solidity.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#lenguajes" class="btn btn-primary btn-lg">Ver Catálogo de Lenguajes 🚀</a>
-                    <a href="#calculadora" class="btn btn-secondary btn-lg">Calculadora de Notas 📊</a>
+                    <a href="#mis-cursos" class="btn btn-primary btn-lg">🎓 Entrar a Mis Cursos (8 Lenguajes) 🚀</a>
+                    <a href="#lenguajes" class="btn btn-secondary btn-lg">Ver Catálogo 💻</a>
                     <button onclick="openShareLinkModal()" class="btn btn-outline btn-lg">Compartir Enlace 🔗</button>
                 </div>
             </div>
@@ -215,6 +215,130 @@
 
     <!-- Main Content Container -->
     <main>
+        <!-- Section: Mis Cursos - Aprendizaje Interactivo Split View -->
+        <section class="section tab-view" id="mis-cursos">
+            <div class="container-fluid" style="max-width: 1400px; margin: 0 auto; padding: 0 15px;">
+                <div class="section-header" style="margin-bottom: 20px;">
+                    <h2 class="section-title">🎓 Mis Cursos - Plataforma de Aprendizaje Interactivo</h2>
+                    <p class="section-subtitle">
+                        Aprende sintaxis, ejecuta código en tiempo real con 8 motores de ejecución (WASM & Backend
+                        Sandbox API), aprueba casos de prueba y evalúa tus conocimientos en 3 niveles.
+                    </p>
+                </div>
+
+                <!-- Selector de Entorno & Nivel -->
+                <div class="courses-selector-bar"
+                    style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; justify-content: space-between; background: #080f24; padding: 15px; border-radius: var(--radius-lg); border: 1px solid var(--border-glow);">
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <label for="course-lang-select" style="font-weight: 700; color: var(--secondary);">💻 Entorno /
+                            Lenguaje:</label>
+                        <select id="course-lang-select" class="form-select" style="width: auto; background: #0b152d;">
+                            <option value="cpp">1. ⚙️ C++ (Primer Lenguaje - Desbloqueado)</option>
+                            <option value="python">2. 🐍 Python (Bloqueado 🔒)</option>
+                            <option value="rust">3. 🦀 Rust (Bloqueado 🔒)</option>
+                            <option value="node">4. 🟢 Node.js (Bloqueado 🔒)</option>
+                            <option value="java">5. ☕ Java (Bloqueado 🔒)</option>
+                            <option value="sql">6. 🗄️ SQL (Bloqueado 🔒)</option>
+                            <option value="typescript">7. 🟦 TypeScript (Bloqueado 🔒)</option>
+                            <option value="solidity">8. ⛓️ Solidity (Bloqueado 🔒)</option>
+                        </select>
+
+                        <label for="course-level-select"
+                            style="font-weight: 700; color: var(--secondary); margin-left: 10px;">📚 Seleccionar Curso
+                            (Máx. 3):</label>
+                        <select id="course-level-select" class="form-select" style="width: auto; background: #0b152d;">
+                            <option value="basico">🟢 Curso 1: Nivel Básico (Fundamentos e I/O)</option>
+                            <option value="intermedio">📘 Curso 2: Nivel Intermedio (Arreglos & Algoritmos)</option>
+                            <option value="avanzado">💜 Curso 3: Nivel Avanzado (Memoria Heap & Optimización)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button id="btn-toggle-docente-admin" class="btn btn-outline btn-sm"
+                            style="border-color: #f59e0b; color: #f59e0b;">👑 Modo Docente: Desbloquear Todo</button>
+                        <div id="course-unlock-badge" class="badge badge-accent"
+                            style="font-size: 0.9rem; padding: 8px 14px;">
+                            📚 3 Cursos Disponibles por Lenguaje
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Split View Layout Container -->
+                <div class="split-view-container">
+                    <!-- Left Panel: Teoría Markdown -->
+                    <div class="split-panel panel-theory">
+                        <div class="panel-header">
+                            <span class="panel-icon">📖</span>
+                            <h3 class="panel-title" id="theory-panel-title">Fundamentos Teóricos</h3>
+                        </div>
+                        <div class="panel-body markdown-content" id="theory-markdown-body">
+                            <!-- Contenido Markdown cargado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Middle Panel: Editor + Compilador Terminal + Casos de Prueba -->
+                    <div class="split-panel panel-practice">
+                        <div class="panel-header" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="panel-icon">💻</span>
+                                <h3 class="panel-title" id="practice-panel-title">Editor Práctico & Compilador</h3>
+                            </div>
+                            <div class="action-buttons-group" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                <button id="btn-run-code" class="btn btn-secondary btn-sm">▶️ Ejecutar</button>
+                                <button id="btn-verify-test-cases" class="btn btn-primary btn-sm">🚀 Verificar
+                                    Casos</button>
+                                <button id="btn-copy-code" class="btn btn-outline btn-sm" title="Copiar código">📋
+                                    Copiar</button>
+                                <button id="btn-download-code" class="btn btn-outline btn-sm"
+                                    title="Descargar archivo">💾 Descargar</button>
+                                <button id="btn-reset-code" class="btn btn-danger-soft btn-sm"
+                                    title="Restablecer plantilla inicial">🔄</button>
+                            </div>
+                        </div>
+                        <div class="panel-body flex-column">
+                            <div class="editor-wrapper">
+                                <textarea id="monaco-code-editor" class="code-editor" spellcheck="false"
+                                    placeholder="Escribe tu código aquí..."></textarea>
+                            </div>
+                            <div class="terminal-wrapper">
+                                <div class="terminal-header">
+                                    <span>🖥️ Consola / Terminal de Salida</span>
+                                    <span id="exec-time-badge" class="term-time-badge"
+                                        style="color: var(--secondary); font-size: 0.75rem;">⚡ 0 ms</span>
+                                </div>
+                                <div class="terminal-body" id="practice-terminal-output">
+                                    <span class="term-dim">Presiona "▶️ Ejecutar" para compilar y ver la salida del
+                                        código.</span>
+                                </div>
+                            </div>
+                            <!-- Casos de Prueba Verifier Card -->
+                            <div class="test-runner-card" id="test-runner-card">
+                                <div class="test-runner-header">
+                                    <span>🧪 Casos de Prueba Automáticos</span>
+                                    <span id="test-cases-score-badge" class="badge">0 / 0 Pasados</span>
+                                </div>
+                                <div class="test-cases-list" id="test-cases-list">
+                                    <span class="term-dim">Presiona "🚀 Verificar Casos" para evaluar tu
+                                        respuesta.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Quizzes & Retroalimentación -->
+                    <div class="split-panel panel-quiz">
+                        <div class="panel-header">
+                            <span class="panel-icon">🎯</span>
+                            <h3 class="panel-title">Quiz de Autoevaluación (≥ 80% Desbloqueo)</h3>
+                        </div>
+                        <div class="panel-body" id="quiz-panel-body">
+                            <!-- Quizzes renderizados dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Section: Catálogo de Lenguajes -->
         <section class="section tab-view" id="lenguajes">
             <div class="container">
@@ -238,64 +362,41 @@
                 <div class="languages-grid" id="languages-grid">
                     <!-- Cards will be populated dynamically by script.js -->
                 </div>
-            </div>
-        </section>
 
-        <!-- Section: Cursos y Material de Estudio PDF -->
-        <section class="section bg-alt tab-view" id="cursos">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Cursos y Material de Estudio (PDFs)</h2>
-                    <p class="section-subtitle">
-                        Accede a los temas, guías y ejercicios prácticos correspondientes a los niveles Básico,
-                        Intermedio y Avanzado de Fundamentos de Programación.
-                    </p>
-                </div>
-
-                <!-- Language Progression Stepper Bar -->
-                <div class="lang-progression-container">
-                    <div class="lang-progression-header">
+                <!-- PDF Courses & Document Catalog (Solo Lectura) -->
+                <div class="pdf-catalog-container"
+                    style="margin-top: 50px; background: #080f24; padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-glow);">
+                    <div class="section-header"
+                        style="margin-bottom: 20px; text-align: left; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                         <div>
-                            <h4 style="margin: 0; font-size: 1rem; color: var(--secondary);">🛣️ Ruta de Aprendizaje por
-                                Lenguaje (Progreso Secuencial)</h4>
-                            <small style="color: var(--text-muted); font-size: 0.8rem;">Completa los 28 cursos de cada
-                                lenguaje para desbloquear el siguiente lenguaje de programación.</small>
+                            <h3 class="section-title" style="font-size: 1.4rem; margin: 0 0 6px 0;">📚 Catálogo de
+                                Cursos y Documentos PDF (Solo Lectura)</h3>
+                            <p class="section-subtitle" style="margin: 0;">Material académico oficial organizado por PDF
+                                1 Parcial, PDF 2 Parcial y PDF 3 Parcial.</p>
                         </div>
-                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <div id="active-lang-status-badge" class="badge badge-accent">🐍 Python • 0 / 28 Completados
-                            </div>
-                            <button id="btn-open-certificate" class="btn btn-primary btn-sm hidden"
-                                style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff; font-weight: 700; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">📜
-                                Obtener Certificado PDF</button>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label for="input-upload-pdf" class="btn btn-primary btn-sm"
+                                style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                📤 Subir Nuevo PDF (Docente)
+                            </label>
+                            <input type="file" id="input-upload-pdf" accept=".pdf" style="display: none;" />
                         </div>
                     </div>
-                    <div class="lang-stepper-bar" id="lang-stepper-bar">
-                        <!-- Renderizado dinámicamente desde JS con los 8 lenguajes y sus candados -->
-                    </div>
-                </div>
 
-                <!-- Course Controls (Filters & Search) -->
-                <div class="course-controls-wrapper">
-                    <div class="filter-bar course-filter-bar">
-                        <button class="pdf-filter-btn active" data-pdf-filter="all">Todos (30)</button>
-                        <button class="pdf-filter-btn" data-pdf-filter="general">📕 Guías Generales (2)</button>
-                        <button class="pdf-filter-btn" data-pdf-filter="basico">🟢 Básico (13)</button>
-                        <button class="pdf-filter-btn" data-pdf-filter="intermedio">📘 Intermedio (10)</button>
-                        <button class="pdf-filter-btn" data-pdf-filter="avanzado">💜 Avanzado (5)</button>
+                    <!-- Filter Buttons for Parciales -->
+                    <div class="filter-bar" style="margin-bottom: 20px; justify-content: flex-start; gap: 8px;">
+                        <button class="pdf-filter-btn filter-btn active" data-parcial="all">Todos los Parciales (25
+                            PDFs)</button>
+                        <button class="pdf-filter-btn filter-btn" data-parcial="p1">📕 PDF 1 Parcial (13 Docs)</button>
+                        <button class="pdf-filter-btn filter-btn" data-parcial="p2">📘 PDF 2 Parcial (7 Docs)</button>
+                        <button class="pdf-filter-btn filter-btn" data-parcial="p3">📙 PDF 3 Parcial (5 Docs)</button>
                     </div>
 
-                    <div class="search-box-wrapper">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="pdf-search-input" class="search-input"
-                            placeholder="Buscar tema o documento (ej: Arreglos, Funciones, Structs)...">
-                        <button id="pdf-search-clear" class="search-clear-btn hidden"
-                            title="Limpiar búsqueda">&times;</button>
+                    <!-- PDF Grid Container -->
+                    <div class="pdf-grid" id="pdf-courses-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                        <!-- Cards populated dynamically by script.js -->
                     </div>
-                </div>
-
-                <!-- PDF Courses Grid -->
-                <div class="pdf-courses-grid" id="pdf-courses-grid">
-                    <!-- PDF Cards populated dynamically by script.js -->
                 </div>
             </div>
         </section>
@@ -499,109 +600,112 @@
                         </div>
                     </div>
                 </div>
-                <!-- Section: Dashboard Administrativo -->
-                <section class="section tab-view" id="admin-dashboard">
-                    <div class="container">
-                        <div class="section-header">
-                            <h2 class="section-title">👑 Dashboard Administrativo & Control Académico</h2>
-                            <p class="section-subtitle">
-                                Supervisa el rendimiento de los estudiantes registrados, gestiona permisos, restablece
-                                accesos y analiza el avance por lenguaje de programación.
-                            </p>
-                        </div>
+            </div>
+        </section>
 
-                        <!-- KPI Cards Row -->
-                        <div class="kpi-grid">
-                            <div class="kpi-card">
-                                <div class="kpi-icon-wrapper" style="--kpi-color: #38bdf8;">👥</div>
-                                <div>
-                                    <div class="kpi-value" id="admin-kpi-total-users">0</div>
-                                    <div class="kpi-label">Estudiantes Registrados</div>
-                                </div>
-                            </div>
-                            <div class="kpi-card">
-                                <div class="kpi-icon-wrapper" style="--kpi-color: #10b981;">✅</div>
-                                <div>
-                                    <div class="kpi-value" id="admin-kpi-total-lessons">0</div>
-                                    <div class="kpi-label">Cursos Aprobados Globales</div>
-                                </div>
-                            </div>
-                            <div class="kpi-card">
-                                <div class="kpi-icon-wrapper" style="--kpi-color: #f59e0b;">🏆</div>
-                                <div>
-                                    <div class="kpi-value" id="admin-kpi-avg-score">0 pts</div>
-                                    <div class="kpi-label">Promedio de Puntos Quiz</div>
-                                </div>
-                            </div>
-                            <div class="kpi-card">
-                                <div class="kpi-icon-wrapper" style="--kpi-color: #818cf8;">⚡</div>
-                                <div>
-                                    <div class="kpi-value" id="admin-kpi-top-lang">Python</div>
-                                    <div class="kpi-label">Lenguaje Principal</div>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Section: Dashboard Administrativo -->
+        <section class="section tab-view" id="admin-dashboard">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">👑 Dashboard Administrativo & Control Académico</h2>
+                    <p class="section-subtitle">
+                        Supervisa el rendimiento de los estudiantes registrados, gestiona permisos, restablece
+                        accesos y analiza el avance por lenguaje de programación.
+                    </p>
+                </div>
 
-                        <!-- Admin Tools Bar -->
-                        <div class="admin-toolbar-card">
-                            <div class="admin-toolbar-search">
-                                <div class="search-box-wrapper" style="width: 100%;">
-                                    <span class="search-icon">🔍</span>
-                                    <input type="text" id="admin-search-input" class="search-input"
-                                        placeholder="Buscar por estudiante o correo...">
-                                </div>
-                            </div>
-
-                            <div class="admin-toolbar-actions">
-                                <button id="btn-admin-add-user" class="btn btn-primary btn-sm">
-                                    ➕ Registrar Alumno
-                                </button>
-                                <button id="btn-admin-export-csv" class="btn btn-secondary btn-sm">
-                                    📥 Exportar CSV
-                                </button>
-                                <button id="btn-admin-export-json" class="btn btn-secondary btn-sm">
-                                    📥 Exportar JSON
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Admin Users Management Table -->
-                        <div class="admin-table-card">
-                            <div class="admin-table-header">
-                                <h4>👥 Lista de Estudiantes y Estado Académico</h4>
-                                <small style="color: var(--text-muted);">Haz clic en "⚡ Desbloquear Todo" para conceder
-                                    acceso maestro a un estudiante.</small>
-                            </div>
-                            <div class="admin-table-container">
-                                <table class="admin-table" id="admin-users-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Estudiante</th>
-                                            <th>Correo / Usuario</th>
-                                            <th>Lenguaje Activo</th>
-                                            <th>Cursos Aprobados</th>
-                                            <th>Nivel</th>
-                                            <th>Acciones Administrador</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="admin-users-table-body">
-                                        <!-- Inyectado dinámicamente desde JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Global Languages Analytics Card -->
-                        <div class="admin-analytics-card">
-                            <h4>📊 Avance Global de la Clase por Lenguajes de Programación</h4>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Porcentaje
-                                medio de cursos completados por los alumnos en cada tecnología.</p>
-                            <div id="admin-language-analytics-list" class="admin-analytics-grid">
-                                <!-- Inyectado dinámicamente desde JS -->
-                            </div>
+                <!-- KPI Cards Row -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #38bdf8;">👥</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-total-users">0</div>
+                            <div class="kpi-label">Estudiantes Registrados</div>
                         </div>
                     </div>
-                </section>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #10b981;">✅</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-total-lessons">0</div>
+                            <div class="kpi-label">Cursos Aprobados Globales</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #f59e0b;">🏆</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-avg-score">0 pts</div>
+                            <div class="kpi-label">Promedio de Puntos Quiz</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper" style="--kpi-color: #818cf8;">⚡</div>
+                        <div>
+                            <div class="kpi-value" id="admin-kpi-top-lang">Python</div>
+                            <div class="kpi-label">Lenguaje Principal</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tools Bar -->
+                <div class="admin-toolbar-card">
+                    <div class="admin-toolbar-search">
+                        <div class="search-box-wrapper" style="width: 100%;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="admin-search-input" class="search-input"
+                                placeholder="Buscar por estudiante o correo...">
+                        </div>
+                    </div>
+
+                    <div class="admin-toolbar-actions">
+                        <button id="btn-admin-add-user" class="btn btn-primary btn-sm">
+                            ➕ Registrar Alumno
+                        </button>
+                        <button id="btn-admin-export-csv" class="btn btn-secondary btn-sm">
+                            📥 Exportar CSV
+                        </button>
+                        <button id="btn-admin-export-json" class="btn btn-secondary btn-sm">
+                            📥 Exportar JSON
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Users Management Table -->
+                <div class="admin-table-card">
+                    <div class="admin-table-header">
+                        <h4>👥 Lista de Estudiantes y Estado Académico</h4>
+                        <small style="color: var(--text-muted);">Haz clic en "⚡ Desbloquear Todo" para conceder
+                            acceso maestro a un estudiante.</small>
+                    </div>
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="admin-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Correo / Usuario</th>
+                                    <th>Lenguaje Activo</th>
+                                    <th>Cursos Aprobados</th>
+                                    <th>Nivel</th>
+                                    <th>Acciones Administrador</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-table-body">
+                                <!-- Inyectado dinámicamente desde JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Global Languages Analytics Card -->
+                <div class="admin-analytics-card">
+                    <h4>📊 Avance Global de la Clase por Lenguajes de Programación</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Porcentaje
+                        medio de cursos completados por los alumnos en cada tecnología.</p>
+                    <div id="admin-language-analytics-list" class="admin-analytics-grid">
+                        <!-- Inyectado dinámicamente desde JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
 
 
     </main>
@@ -861,9 +965,16 @@
 
                 <!-- Tab 1: Guided Example Content -->
                 <div id="practice-view-example" class="practice-view-content">
-                    <div class="code-controls" style="margin-bottom: 12px; justify-content: flex-end;">
+                    <div class="code-controls"
+                        style="margin-bottom: 12px; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                         <button id="btn-run-practice-example" class="btn btn-primary btn-sm">▶️ Compilar & Ejecutar
                             Ejemplo</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="btn-copy-example-code" class="btn btn-secondary btn-sm"
+                                title="Copiar código al portapapeles">📋 Copiar</button>
+                            <button id="btn-download-example-code" class="btn btn-outline btn-sm"
+                                title="Descargar archivo de código">💾 Descargar</button>
+                        </div>
                     </div>
                     <div class="code-window">
                         <div class="window-header">
@@ -891,11 +1002,22 @@
                         <p id="exercise-prompt-text">Crea un programa que imprima el resultado solicitado para resolver
                             este tema de estudio.</p>
                     </div>
-                    <div class="code-controls" style="margin-bottom: 12px; justify-content: space-between;">
-                        <button id="btn-run-practice-exercise" class="btn btn-secondary btn-sm">▶️ Probar
-                            Código</button>
-                        <button id="btn-eval-practice-exercise" class="btn btn-primary btn-sm">🚀 Evaluar & Aprobar
-                            Curso</button>
+                    <div class="code-controls"
+                        style="margin-bottom: 12px; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; gap: 8px;">
+                            <button id="btn-run-practice-exercise" class="btn btn-secondary btn-sm">▶️ Probar
+                                Código</button>
+                            <button id="btn-eval-practice-exercise" class="btn btn-primary btn-sm">🚀 Evaluar & Aprobar
+                                Curso</button>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="btn-copy-exercise-code" class="btn btn-secondary btn-sm"
+                                title="Copiar solución al portapapeles">📋 Copiar</button>
+                            <button id="btn-download-exercise-code" class="btn btn-outline btn-sm"
+                                title="Descargar solución del estudiante">💾 Descargar</button>
+                            <button id="btn-reset-exercise-code" class="btn btn-danger-soft btn-sm"
+                                title="Restablecer plantilla inicial">🔄 Restablecer</button>
+                        </div>
                     </div>
                     <div class="code-window">
                         <div class="window-header">
@@ -1104,10 +1226,38 @@
         </div>
     </div>
 
+    <!-- Read-Only PDF Viewer Modal -->
+    <div id="pdf-viewer-modal" class="modal-overlay hidden"
+        style="position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div
+            style="background: #080f24; border: 1px solid var(--border-glow); border-radius: var(--radius-lg); width: 95%; max-width: 1150px; height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.9);">
+            <div
+                style="background: #0b152d; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glow);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 1.4rem;">📄</span>
+                    <div>
+                        <h3 id="pdf-modal-filename" style="margin: 0; font-size: 1.1rem; color: var(--secondary);">
+                            Documento PDF</h3>
+                        <span id="pdf-modal-subtitle" style="font-size: 0.75rem; color: var(--text-dim);">Solo Lectura
+                            Protegido</span>
+                    </div>
+                    <span class="badge badge-accent" style="font-size: 0.75rem; padding: 4px 10px;">🔒 Solo
+                        Lectura</span>
+                </div>
+                <button id="btn-close-pdf-modal" class="btn btn-danger-soft btn-sm" style="font-weight: bold;">✕
+                    Cerrar</button>
+            </div>
+            <div style="flex: 1; background: #040914; position: relative;">
+                <iframe id="pdf-frame-element" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notifications Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- JavaScript -->
+    <script src="execution-engine.js"></script>
     <script src="script.js"></script>
 </body>
 

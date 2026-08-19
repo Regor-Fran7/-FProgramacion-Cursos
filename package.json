@@ -1,0 +1,37 @@
+{
+  "name": "devhub-fp-cursos",
+  "version": "2.0.0",
+  "description": "Plataforma interactiva de estudio de programación para estudiantes de FP con 8 motores de ejecución, Split View, Casos de Prueba y Quizzes.",
+  "main": "script.js",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "dev": "python -m http.server 8080",
+    "test": "node -c script.js && node -c execution-engine.js"
+  },
+  "keywords": [
+    "education",
+    "programming",
+    "fp",
+    "python",
+    "cpp",
+    "rust",
+    "nodejs",
+    "java",
+    "sql",
+    "typescript",
+    "solidity",
+    "wasm",
+    "pyodide",
+    "piston"
+  ],
+  "author": "DevHub FP Team",
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "^5.65.16",
+    "katex": "^0.16.9",
+    "marked": "^11.1.1",
+    "pyodide": "^0.25.0",
+    "solc": "^0.8.24",
+    "sql.js": "^1.10.2"
+  }
+}
