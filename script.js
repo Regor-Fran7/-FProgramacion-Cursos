@@ -3571,18 +3571,82 @@ function initDocenteAdminToggle() {
 
 const COURSE_LEVEL_KEYS = ['c1', 'c2', 'c3', 'c4'];
 
+function isCourseCompleted(langId, levelKey) {
+    const key = `devhub_course_completed_${langId}_${levelKey}`;
+    if (localStorage.getItem(key) === 'true') return true;
+    if (userProfile && Array.isArray(userProfile.completedLessons)) {
+        if (userProfile.completedLessons.includes(`${langId}-${levelKey}`)) return true;
+    }
+    return false;
+}
+
 function isLanguageCompleted(langId) {
-    return COURSE_LEVEL_KEYS.every(level => {
-        return localStorage.getItem(`devhub_course_completed_${langId}_${level}`) === 'true';
-    });
+    return COURSE_LEVEL_KEYS.every(levelKey => isCourseCompleted(langId, levelKey));
 }
 
 function getLanguageCompletedCount(langId) {
     let count = 0;
-    COURSE_LEVEL_KEYS.forEach(l => {
-        if (localStorage.getItem(`devhub_course_completed_${langId}_${l}`) === 'true') count++;
+    COURSE_LEVEL_KEYS.forEach(levelKey => {
+        if (isCourseCompleted(langId, levelKey)) count++;
     });
     return count;
+}
+
+function markCourseModuleAsCompleted(langId, levelKey) {
+    const passKey = `devhub_course_completed_${langId}_${levelKey}`;
+    const wasCompletedBefore = isCourseCompleted(langId, levelKey);
+
+    localStorage.setItem(passKey, 'true');
+
+    if (userProfile && userProfile.id) {
+        if (!userProfile.completedLessons) userProfile.completedLessons = [];
+        const lessonCode = `${langId}-${levelKey}`;
+        if (!userProfile.completedLessons.includes(lessonCode)) {
+            userProfile.completedLessons.push(lessonCode);
+        }
+        const db = getUsersDB();
+        const uIdx = db.findIndex(u => u.id === userProfile.id);
+        if (uIdx >= 0) {
+            db[uIdx] = userProfile;
+            saveUsersDB(db);
+        }
+    }
+
+    updateLanguageSelectorUI();
+
+    const currentIdx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === langId);
+    const langObj = LANGUAGE_PROGRESSION_SEQUENCE[currentIdx];
+
+    if (isLanguageCompleted(langId)) {
+        if (currentIdx >= 0 && currentIdx < LANGUAGE_PROGRESSION_SEQUENCE.length - 1) {
+            const nextLang = LANGUAGE_PROGRESSION_SEQUENCE[currentIdx + 1];
+            
+            const langSelect = document.getElementById('course-lang-select');
+            if (langSelect) {
+                langSelect.value = nextLang.id;
+            }
+            currentCourseLang = nextLang.id;
+            currentCourseLevel = 'c1';
+            const levelSelect = document.getElementById('course-level-select');
+            if (levelSelect) levelSelect.value = 'c1';
+
+            updateLanguageSelectorUI();
+            renderMisCursosModule();
+
+            if (typeof showToast === 'function') {
+                showToast(`🎉 ¡FELICIDADES! Has completado los 4 cursos de ${langObj ? langObj.name : langId}. ¡${nextLang.name} ha sido DESBLOQUEADO! 🔓`, 'success');
+            }
+        } else {
+            if (typeof showToast === 'function') {
+                showToast(`🏆 ¡FELICIDADES MAESTRO! Has completado TODOS los 8 lenguajes de programación del curso.`, 'success');
+            }
+        }
+    } else if (!wasCompletedBefore) {
+        const count = getLanguageCompletedCount(langId);
+        if (typeof showToast === 'function') {
+            showToast(`🎉 ¡Curso Aprobado! Progreso en ${langObj ? langObj.name : langId}: ${count}/4 Cursos`, 'success');
+        }
+    }
 }
 
 function updateLanguageSelectorUI() {
@@ -3596,6 +3660,8 @@ function updateLanguageSelectorUI() {
         const unlocked = isLanguageUnlocked(langId);
         const completed = isLanguageCompleted(langId);
         const count = getLanguageCompletedCount(langId);
+
+        opt.disabled = !unlocked;
 
         if (completed) {
             opt.textContent = `${idx + 1}. ${seqItem ? seqItem.icon : ''} ${seqItem ? seqItem.name : langId} (✅ Completado 4/4)`;
@@ -3715,29 +3781,7 @@ async function initMisCursosSystem() {
             }
 
             if (res.passed === res.total && res.total > 0) {
-                const passKey = `devhub_course_completed_${currentCourseLang}_${currentCourseLevel}`;
-                const wasCompletedBefore = localStorage.getItem(passKey) === 'true';
-                localStorage.setItem(passKey, 'true');
-
-                updateLanguageSelectorUI();
-
-                if (isLanguageCompleted(currentCourseLang)) {
-                    const currentIdx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === currentCourseLang);
-                    if (currentIdx >= 0 && currentIdx < LANGUAGE_PROGRESSION_SEQUENCE.length - 1) {
-                        const nextLang = LANGUAGE_PROGRESSION_SEQUENCE[currentIdx + 1];
-                        if (typeof showToast === 'function') {
-                            showToast(`🎉 ¡Felicidades! Has completado ${LANGUAGE_PROGRESSION_SEQUENCE[currentIdx].name}. ¡${nextLang.name} ha sido DESBLOQUEADO! 🔓`, 'success');
-                        }
-                    } else {
-                        if (typeof showToast === 'function') {
-                            showToast(`🏆 ¡FELICIDADES! Has completado TODOS los 8 lenguajes de programación del curso.`, 'success');
-                        }
-                    }
-                } else if (!wasCompletedBefore) {
-                    if (typeof showToast === 'function') {
-                        showToast(`🎉 ¡Curso Aprobado! Progreso en ${currentCourseLang.toUpperCase()}: ${getLanguageCompletedCount(currentCourseLang)}/3`, 'success');
-                    }
-                }
+                markCourseModuleAsCompleted(currentCourseLang, currentCourseLevel);
             } else {
                 if (typeof showToast === 'function') showToast('❌ Algunos casos de prueba fallaron', 'error');
             }
@@ -3908,6 +3952,7 @@ window.checkQuizAnswer = function(lang, level, qIdx, selectedIdx, correctIdx, ex
         feedbackBox.className = 'quiz-feedback-box correct';
         feedbackBox.innerHTML = `<strong>✅ ¡Respuesta Correcta!</strong><br>${explanation}`;
         if (typeof showToast === 'function') showToast('🎯 ¡Respuesta Correcta!', 'success');
+        markCourseModuleAsCompleted(lang, level);
     } else {
         feedbackBox.className = 'quiz-feedback-box incorrect';
         feedbackBox.innerHTML = `<strong>❌ Respuesta Incorrecta.</strong><br>${explanation}`;
