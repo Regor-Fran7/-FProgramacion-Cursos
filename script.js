@@ -4485,8 +4485,9 @@ window.openPdfViewerModal = function(fileEnc, titleEnc, parcialTitle) {
     if (titleEl) titleEl.textContent = title;
     if (subTitleEl) subTitleEl.textContent = `${parcialTitle} • Modo Lectura Protegido`;
 
-    // #toolbar=0 disables downloading/printing in standard browser PDF plugin
-    frame.src = `${file}#toolbar=0&navpanes=0&view=FitH`;
+    // Encode spaces in relative URL path for GitHub Pages compatibility
+    const targetUrl = file.startsWith('blob:') ? file : encodeURI(file);
+    frame.src = `${targetUrl}#toolbar=0&navpanes=0&view=FitH`;
     modal.classList.remove('hidden');
 
     if (typeof showToast === 'function') {
