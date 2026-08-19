@@ -3676,7 +3676,7 @@ async function initMisCursosSystem() {
                 const idx = LANGUAGE_PROGRESSION_SEQUENCE.findIndex(l => l.id === selectedLang);
                 const prevLang = LANGUAGE_PROGRESSION_SEQUENCE[idx - 1];
                 if (typeof showToast === 'function') {
-                    showToast(`🔒 Lenguaje Bloqueado: Debes completar los 3 cursos de ${prevLang ? prevLang.name : 'el lenguaje anterior'} primero.`, 'error');
+                    showToast(`🔒 Lenguaje Bloqueado: Debes completar los 4 cursos de ${prevLang ? prevLang.name : 'el lenguaje anterior'} primero.`, 'error');
                 }
                 langSelect.value = currentCourseLang;
                 return;
@@ -3788,6 +3788,14 @@ function getCurrentModule() {
 }
 
 function renderMisCursosModule() {
+    if (!isLanguageUnlocked(currentCourseLang)) {
+        currentCourseLang = 'cpp';
+        currentCourseLevel = 'c1';
+        const langSelect = document.getElementById('course-lang-select');
+        if (langSelect) langSelect.value = 'cpp';
+        const levelSelect = document.getElementById('course-level-select');
+        if (levelSelect) levelSelect.value = 'c1';
+    }
     updateLanguageSelectorUI();
     const module = getCurrentModule();
     if (!module) return;
