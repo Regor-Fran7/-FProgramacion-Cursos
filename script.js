@@ -3709,6 +3709,11 @@ async function initMisCursosSystem() {
             const res = await ExecutionEngine.runTestCases(currentCourseLang, code, module.testCases || []);
             renderTestCaseResults(res);
 
+            const term = document.getElementById('practice-terminal-output');
+            if (term && res.results && res.results.length > 0 && res.results[0].actual) {
+                term.innerHTML = res.results[0].actual.split('\n').map(l => `<div>${escapeHtml(l)}</div>`).join('');
+            }
+
             if (res.passed === res.total && res.total > 0) {
                 const passKey = `devhub_course_completed_${currentCourseLang}_${currentCourseLevel}`;
                 const wasCompletedBefore = localStorage.getItem(passKey) === 'true';
