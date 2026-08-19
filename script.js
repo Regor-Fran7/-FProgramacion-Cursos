@@ -1746,23 +1746,17 @@ function updateUserProfileUI() {
         if (btnOpenModal) btnOpenModal.classList.remove('hidden');
         if (btnLogoutNav) btnLogoutNav.classList.remove('hidden');
 
-        const btnToggleDocente = document.getElementById('btn-toggle-docente-admin');
         if (isAdminUser(userProfile)) {
             if (navLinkAdmin) navLinkAdmin.classList.remove('hidden');
-            if (btnToggleDocente) btnToggleDocente.classList.remove('hidden');
             if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
         } else {
             if (navLinkAdmin) navLinkAdmin.classList.add('hidden');
-            if (btnToggleDocente) btnToggleDocente.classList.add('hidden');
-            isDocenteAdminMode = false;
         }
 
         if (nameMini) nameMini.textContent = userProfile.name || 'Estudiante';
         if (avatarMini) avatarMini.textContent = userProfile.avatar || '👨‍💻';
         if (levelBadge) levelBadge.textContent = isAdminUser(userProfile) ? 'Docente Master' : `Nivel ${currentLevel}`;
     } else {
-        const btnToggleDocente = document.getElementById('btn-toggle-docente-admin');
-        if (btnToggleDocente) btnToggleDocente.classList.add('hidden');
         if (guestActions) guestActions.classList.remove('hidden');
         if (userBadge) userBadge.classList.add('hidden');
         if (btnOpenModal) btnOpenModal.classList.add('hidden');
@@ -3522,51 +3516,7 @@ function isLanguageUnlocked(langId) {
 }
 
 function initDocenteAdminToggle() {
-    const btn = document.getElementById('btn-toggle-docente-admin');
-    if (!btn) return;
-
-    function updateBtnUI() {
-        if (!isAdminUser(userProfile)) {
-            btn.classList.add('hidden');
-            return;
-        } else {
-            btn.classList.remove('hidden');
-        }
-
-        if (isDocenteAdminMode) {
-            btn.textContent = '👑 Modo Docente: ACTIVADO (Todo Desbloqueado)';
-            btn.className = 'btn btn-primary btn-sm';
-            btn.style.background = '#f59e0b';
-            btn.style.color = '#000';
-            btn.style.fontWeight = 'bold';
-        } else {
-            btn.textContent = '👑 Modo Docente: Desbloquear Todo';
-            btn.className = 'btn btn-outline btn-sm';
-            btn.style.borderColor = '#f59e0b';
-            btn.style.color = '#f59e0b';
-            btn.style.background = 'transparent';
-        }
-    }
-
-    updateBtnUI();
-
-    btn.addEventListener('click', () => {
-        if (!isAdminUser(userProfile)) return;
-        isDocenteAdminMode = !isDocenteAdminMode;
-        localStorage.setItem('devhub_docente_admin_mode', isDocenteAdminMode ? 'true' : 'false');
-        updateBtnUI();
-        updateLanguageSelectorUI();
-
-        if (isDocenteAdminMode) {
-            if (typeof showToast === 'function') {
-                showToast('👑 Modo Administrador / Docente ACTIVADO: Todos los 8 lenguajes y cursos están DESBLOQUEADOS.', 'success');
-            }
-        } else {
-            if (typeof showToast === 'function') {
-                showToast('🎓 Modo Estudiante ACTIVADO: Progreso secuencial restaurado.', 'info');
-            }
-        }
-    });
+    // Modo Docente toggle button removed per user request
 }
 
 const COURSE_LEVEL_KEYS = ['c1', 'c2', 'c3', 'c4'];
